@@ -14,6 +14,22 @@ Pesaing [Mikhmon](https://laksa19.github.io/) dengan UI glassmorphism/neumorphis
 | [`shared/`](shared/) | Template login hotspot glass & template voucher cetak |
 | [`docs/`](docs/) | PLAN, FEATURES (gap analysis), ARCHITECTURE, skrip RouterOS |
 
+## Tampilan
+
+Tangkapan layar asli dari edisi PHP dalam mode demo (data palsu, tanpa router sungguhan).
+
+| | |
+|---|---|
+| <img src="docs/screenshots/nextmon-dashboard-dark.jpg" alt="Dasbor (tema gelap): sesi aktif, pendapatan, trafik langsung, resource router" width="100%"><br><sub>Dasbor (tema gelap): sesi aktif, pendapatan, trafik langsung, resource router</sub> | <img src="docs/screenshots/nextmon-dashboard-light.jpg" alt="Dasbor (tema terang) dengan peta panas penjualan" width="100%"><br><sub>Dasbor (tema terang) dengan peta panas penjualan</sub> |
+| <img src="docs/screenshots/nextmon-hotspot-users.jpg" alt="User hotspot: filter profil, batch, dan status" width="100%"><br><sub>User hotspot: filter profil, batch, dan status</sub> | <img src="docs/screenshots/nextmon-vouchers-generate.jpg" alt="Generate voucher: pilih profil, jumlah, karakter, dan desain kartu" width="100%"><br><sub>Generate voucher: pilih profil, jumlah, karakter, dan desain kartu</sub> |
+| <img src="docs/screenshots/nextmon-voucher-print.jpg" alt="Cetak voucher desain Glass Aurora dengan QR login" width="100%"><br><sub>Cetak voucher desain Glass Aurora dengan QR login</sub> | <img src="docs/screenshots/nextmon-pos.jpg" alt="Jual cepat (POS): satu ketukan satu voucher" width="100%"><br><sub>Jual cepat (POS): satu ketukan satu voucher</sub> |
+| <img src="docs/screenshots/nextmon-reports.jpg" alt="Laporan penjualan: grafik harian dan ringkasan per profil" width="100%"><br><sub>Laporan penjualan: grafik harian dan ringkasan per profil</sub> | <img src="docs/screenshots/nextmon-resellers.jpg" alt="Reseller: dompet prabayar, komisi, dan kode referal toko" width="100%"><br><sub>Reseller: dompet prabayar, komisi, dan kode referal toko</sub> |
+| <img src="docs/screenshots/nextmon-routers.jpg" alt="Router, termasuk berbagi akses baca-saja ke akun lain" width="100%"><br><sub>Router, termasuk berbagi akses baca-saja ke akun lain</sub> | <img src="docs/screenshots/nextmon-settings.jpg" alt="Pengaturan umum dan batas paket akun" width="100%"><br><sub>Pengaturan umum dan batas paket akun</sub> |
+| <img src="docs/screenshots/nextmon-shop.jpg" alt="Toko voucher publik (bayar online)" width="100%"><br><sub>Toko voucher publik (bayar online)</sub> | <img src="docs/screenshots/nextmon-status.jpg" alt="Halaman publik cek status voucher" width="100%"><br><sub>Halaman publik cek status voucher</sub> |
+| <img src="docs/screenshots/nextmon-platform-accounts.jpg" alt="Admin platform: banyak akun dengan batas masing-masing" width="100%"><br><sub>Admin platform: banyak akun dengan batas masing-masing</sub> | <img src="docs/screenshots/nextmon-backup.jpg" alt="Backup dan pulihkan data NextMON (opsional terenkripsi)" width="100%"><br><sub>Backup dan pulihkan data NextMON (opsional terenkripsi)</sub> |
+
+<p align="center"><img src="docs/screenshots/nextmon-mobile-dashboard.jpg" alt="Dasbor di ponsel" width="280"><br><sub>Dasbor di ponsel (mobile-first, navigasi bawah)</sub></p>
+
 ## Cara termudah di Windows: NextMON Server
 [**NextMON Server**](https://github.com/FirmanKurniawan/NextMon-Server) adalah peluncur `.exe` portabel (tray, panel kontrol, manajer runtime PHP/Node, backup, update) yang menjalankan **satu edisi** NextMON, PHP *atau* Next.js, tanpa instalasi. Unduh paket **lite** (runtime diunduh dari panel) atau **full** (PHP + Node bawaan) di halaman [Releases](https://github.com/FirmanKurniawan/NextMon/releases), ekstrak, lalu klik dua kali `NextMON Server.exe`. Petunjuk lengkap: [README NextMON Server](https://github.com/FirmanKurniawan/NextMon-Server#readme).
 
