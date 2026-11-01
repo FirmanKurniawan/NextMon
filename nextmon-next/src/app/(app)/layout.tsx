@@ -44,8 +44,9 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     <html lang={ctx.lang} data-theme="auto" suppressHydrationWarning>
       <head>
         {/* blocking on purpose: applies theme/accent/density before first paint (no flash) */}
+        {/* browsers hide the nonce attribute from the DOM (the client sees ""), so React would flag a hydration mismatch */}
         {/* eslint-disable-next-line @next/next/no-sync-scripts */}
-        <script src="/assets/js/theme.js" nonce={nonce} />
+        <script src="/assets/js/theme.js" nonce={nonce} suppressHydrationWarning />
       </head>
       <body data-page={route?.pageKey ?? ''} data-base="" data-csrf={ctx.csrf} data-lang={ctx.lang} data-demo={ctx.demo ? '1' : '0'}>
         <Shell ctx={ctx} page={route?.pageKey ?? ''} title={title} scripts={route?.scripts ?? ['/assets/js/app.js']} nonce={nonce} back={full}>

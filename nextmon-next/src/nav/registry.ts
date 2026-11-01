@@ -16,10 +16,11 @@ export function allNavItems(): NavItem[] {
 }
 
 /** Navigation visible to a user: items filtered by capability, grouped, ordered. Empty groups are dropped. */
-export function buildNav(can: (cap: Cap) => boolean): NavGroup[] {
+export function buildNav(can: (cap: Cap) => boolean, role?: string): NavGroup[] {
   const groups = new Map<string, NavItem[]>();
   for (const it of allNavItems()) {
     if (!can(it.cap ?? 'view')) continue;
+    if (it.roles && role !== undefined && !it.roles.includes(role)) continue;
     if (!groups.has(it.group)) groups.set(it.group, []);
     groups.get(it.group)!.push(it);
   }
@@ -34,9 +35,10 @@ export function buildNav(can: (cap: Cap) => boolean): NavGroup[] {
 
 /** Up to 4 items for the mobile bottom tab bar. */
 export function tabItems(nav: NavGroup[]): NavItem[] {
-  return nav
-    .flatMap((g) => g.items)
-    .filter((i) => i.tab !== undefined)
+  const all = nav.flatMap((g) => g.items);
+  const visible = new Set(all.map((i) => i.key));
+  return all
+    .filter((i) => i.tab !== undefined && !(i.tabFallback && visible.has(i.tabFallback)))
     .sort((a, b) => a.tab! - b.tab!)
     .slice(0, 4);
 }

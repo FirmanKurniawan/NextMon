@@ -30,6 +30,7 @@ export async function placeOrder(fd: FormData): Promise<PlaceResult> {
       package: field(fd, 'package', 40),
       terms: field(fd, 'terms', 4),
       website: field(fd, 'website', 200),
+      ref: field(fd, 'ref', 60),
       ip: info.ip,
       origin: info.origin,
       host: info.host,

@@ -92,7 +92,7 @@ export const Routers = {
   ensureDemo(): RouterView {
     const existing = own().find((r) => r.type === 'demo');
     if (existing) return view(existing, false, 'rw', Workspace.id());
-    const cfg: RouterCfg = { id: randomHex(4), name: 'Demo Router', session: 'demo', type: 'demo', host: '', port: 8728, ssl: false, verify_tls: false, user: '', pass: '', hotspot_name: 'Demo WiFi' };
+    const cfg: RouterCfg = { id: randomHex(4), name: 'Demo Router', session: 'demo', type: 'demo', host: '', port: 8728, ssl: false, verify_tls: false, user: '', pass: '', hotspot_name: 'NextMON Demo WiFi' };
     Store.update<RouterCfg[]>('routers', (l) => [...l, cfg], []);
     return view(cfg, false, 'rw', Workspace.id());
   },

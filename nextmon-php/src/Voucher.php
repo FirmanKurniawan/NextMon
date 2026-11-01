@@ -43,6 +43,17 @@ final class Voucher
         $batch = mb_substr($batch, 0, 24);
         $comment = $mode . '-' . random_int(100, 999) . '-' . date('m.d.y') . ($batch !== '' ? '-' . $batch : '');
 
+        $tok = Quota::reserve($qty);   // daily voucher limit: refuses the whole batch (QuotaException) before anything is created
+        try {
+            return self::build($r, $o, $qty, $len, $prefix, $set, $mode, $comment, $tok);
+        } catch (Throwable $e) {
+            Quota::release($tok);   // generation failed: give the reserved units back
+            throw $e;
+        }
+    }
+
+    private static function build(Driver $r, array $o, int $qty, int $len, string $prefix, string $set, string $mode, string $comment, ?array $tok): array
+    {
         $existing = array_flip(array_column($r->print('/ip/hotspot/user', [], ['name']), 'name'));
         $items = [];
         $rows = [];
@@ -69,6 +80,7 @@ final class Voucher
         }
         // pipelined: 100 vouchers per round-trip instead of one per voucher
         Pipe::adds($r, '/ip/hotspot/user', $rows);
+        Quota::release($tok, $qty - count($items));   // fewer codes than asked (collision guard)
         return ['comment' => $comment, 'items' => $items];
     }
 

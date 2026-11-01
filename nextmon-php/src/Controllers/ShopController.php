@@ -14,6 +14,7 @@ class ShopController
         App::renderBare('shop', [
             'c' => $c, 'title' => Shop::title($c), 'packages' => $c['enabled'] ? Shop::activePackages($c) : [],
             'err' => $err, 'old' => $old,
+            'ref' => (Reseller::byRef(App::get('ref')) ?? [])['code'] ?? '',   // only a valid active reseller code is echoed back into the form
         ]);
     }
 
@@ -21,10 +22,11 @@ class ShopController
     public static function create(): void
     {
         $c = Shop::config();
-        $fail = function (string $msg, array $old = []) {
+        $refIn = Reseller::cleanRef(App::post('ref'));
+        $fail = function (string $msg, array $old = []) use ($refIn) {
             $_SESSION['shop_err'] = $msg;
             $_SESSION['shop_old'] = $old;
-            App::redirect(Shop::homePath());
+            App::redirect(Shop::homePath() . ($refIn !== '' ? (Shop::wQuery() === '' ? '?' : '&') . 'ref=' . $refIn : ''));
         };
         if (!$c['enabled']) {
             $fail(t('The shop is currently closed.'));
@@ -70,7 +72,9 @@ class ShopController
             $fail(t('The shop is not configured yet.'), $old);
         }
 
-        $o = Orders::create($pkg, ['name' => $name, 'phone' => $phone, 'email' => $email], $c['gateway'], (int)$c['expiry_minutes'], $router['id']);
+        // Referral: attribution only. Unknown / inactive code = ignored silently. Commission needs a PAID, verified order total.
+        $attr = Reseller::byRef($refIn);
+        $o = Orders::create($pkg, ['name' => $name, 'phone' => $phone, 'email' => $email], $c['gateway'], (int)$c['expiry_minutes'], $router['id'], $attr);
         try {
             $ctx = [
                 'return_url' => Shop::orderUrl($o, true), 'callback_url' => Shop::callbackUrl($c['gateway']),

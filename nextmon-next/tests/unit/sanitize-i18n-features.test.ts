@@ -60,7 +60,7 @@ describe('i18n', () => {
     expect(I18n.translate('id', 'Sign out')).toBe('Keluar');
   });
   it('feature dictionaries are merged without editing core', () => {
-    expect(I18n.translate('id', 'Hotspot hosts')).toBe('Host hotspot'); // from src/features/hosts
+    expect(I18n.translate('id', 'Share router')).toBe('Bagikan router'); // from src/features/routers
   });
   it('pick(): cookie beats Accept-Language beats default', () => {
     expect(I18n.pick('en', 'id', 'id')).toBe('en');

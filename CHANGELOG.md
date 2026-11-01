@@ -49,3 +49,4 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/).
 - `nextmon-php/tests/tenant_isolation_test.php`: suite isolasi antar-akun.
 - Multi-akun (PHP): workspace per pemilik, halaman platform, berbagi router ro/rw, migrasi data lama ke `main`. Suite isolasi 19 area lulus (json). Batas voucher/hari dan log belum diberlakukan.
 - NextMON Server (Rust): exe 0.1.0 dengan supervisor, API kontrol, tray, CLI, backup. Port kontrol bawaan 47878.
+- Kedua edisi: batas `vouchers_per_day` dan `log_rows` diberlakukan (penghitung aman balapan, tampil di Pengaturan + halaman platform); backup/restore data aplikasi dari UI (pratinjau, cadangan pengaman, lintas edisi); penjualan reseller lewat toko (`?ref=`, komisi sekali, balik saat refund); audit kesetaraan `docs/PARITY.md`. Tes: PHP 214, isolasi akun 19/19, Next.js 284, build produksi OK, 41 halaman dimuat tanpa error (mode demo).

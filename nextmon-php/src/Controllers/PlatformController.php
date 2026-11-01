@@ -43,6 +43,8 @@ class PlatformController
                 'user_count' => count($users),
                 'router_count' => count(Workspace::run($id, fn() => (array)Store::read('routers', []))),
                 'eff' => Workspace::limits($id),
+                'vq' => Quota::usage($id),
+                'lq' => Quota::logUsage($id),
             ];
         }
         App::render('platform_accounts', [

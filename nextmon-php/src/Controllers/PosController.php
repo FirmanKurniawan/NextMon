@@ -46,6 +46,9 @@ class PosController
             if ($rsv) {
                 Reseller::rollback($rsv, 'pos error');
             }
+            if ($ex instanceof QuotaException) {   // daily voucher limit: nothing created, wallet refunded above
+                App::json(['ok' => false, 'error' => $ex->getMessage(), 'used' => $ex->used, 'limit' => $ex->limit], 429);
+            }
             throw $ex;
         }
         // [/RESELLER-HOOK]

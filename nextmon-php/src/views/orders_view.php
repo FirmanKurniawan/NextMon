@@ -20,6 +20,11 @@ $act = fn(string $do, string $label, string $cls = '', string $extra = '', strin
       <dt><?= e(t('Gateway')) ?></dt><dd><?= e($gateway ? $gateway->label() : $o['gateway']) ?></dd>
       <dt><?= e(t('Gateway reference')) ?></dt><dd class="mono"><?= e($o['ref'] ?: '-') ?></dd>
       <dt>IP</dt><dd class="mono"><?= e($o['ip'] ?? '') ?></dd>
+      <?php if (!empty($o['attr'])) { $at = $o['attr']; $rn = '';
+          foreach (Auth::users() as $ru) { if ($ru['id'] === $at['uid']) { $rn = $ru['username']; } } ?>
+      <dt><?= e(t('Reseller')) ?></dt><dd><a href="<?= e(url('/resellers/ledger?uid=' . rawurlencode($at['uid']))) ?>"><?= e($rn !== '' ? $rn : $at['uid']) ?></a> <span class="muted mono">(ref <?= e($at['code']) ?>)</span></dd>
+      <dt><?= e(t('Commission')) ?></dt><dd class="mono"><?php if (!empty($at['reversed_at'])) { echo e(money((int)$at['comm'])) . ' &middot; ' . e(t('Reversed')); } elseif (!empty($at['credited_at'])) { echo e(money((int)$at['comm'])) . ' &middot; ' . e(t('Credited')); } elseif (!empty($at['skipped'])) { echo e(t('Skipped (reseller inactive)')); } else { echo e(t('Pending (paid and fulfilled)')); } ?></dd>
+      <?php } ?>
     </dl></div>
   </section>
   <section class="card glass col-6">

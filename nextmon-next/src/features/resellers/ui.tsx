@@ -2,6 +2,9 @@ import { Badge } from '../_sales/ui';
 import type { TFn } from '../../lib/i18n.ts';
 import type { LedgerRow } from '../../lib/reseller.ts';
 
+/** Shop order id carried by a ledger row (shop commission rows), or ''. */
+export const orderOf = (r: { meta: Record<string, unknown> }): string => (typeof r.meta?.order === 'string' ? r.meta.order : '');
+
 export function Assets() {
   return <link rel="stylesheet" href="/assets/css/mod-security.css" precedence="default" />;
 }

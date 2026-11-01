@@ -65,6 +65,7 @@ export default function PlatformAccountsPage({ ctx }: PageProps) {
                 <th>{t('Owner')}</th>
                 <th>{t('Users')}</th>
                 <th>{t('Routers')}</th>
+                <th>{t('Usage')}</th>
                 <th>{t('Limits')}</th>
                 <th>
                   <span className="sr-only">{t('Actions')}</span>
@@ -88,6 +89,13 @@ export default function PlatformAccountsPage({ ctx }: PageProps) {
                     <td data-label={t('Users')}>{w.user_count}</td>
                     <td data-label={t('Routers')}>
                       {w.router_count} / {w.eff.routers > 0 ? w.eff.routers : '∞'}
+                    </td>
+                    <td data-label={t('Usage')}>
+                      {t('Vouchers today')}: {w.vq.used}/{w.vq.limit > 0 ? w.vq.limit : '∞'}
+                      <br />
+                      <span className="muted">
+                        {t('Log rows')}: {w.lq.used}/{w.lq.limit > 0 ? w.lq.limit : '∞'}
+                      </span>
                     </td>
                     <td data-label={t('Limits')}>
                       <ActionForm action={saveLimitsAction} className="inline-form row" style={{ display: 'flex', gap: 'var(--s1)', flexWrap: 'wrap' }}>

@@ -1,6 +1,5 @@
 /** Indonesian strings of the routers feature (also used by onboarding). */
 export const id: Record<string, string> = {
-  'A shared router can only be changed by its owner.': 'Router yang dibagikan hanya bisa diubah oleh pemiliknya.',
   'Verify the router certificate (needs a trusted certificate on the router)': 'Verifikasi sertifikat router (perlu sertifikat tepercaya di router)',
   'Share router': 'Bagikan router',
   'Workspace slug': 'Slug workspace',
@@ -10,11 +9,8 @@ export const id: Record<string, string> = {
   'Read/write': 'Baca/tulis',
   'The other account never sees the router address or password. Sharing again replaces the access level.': 'Akun lain tidak pernah melihat alamat atau kata sandi router. Membagikan ulang akan mengganti tingkat akses.',
   Share: 'Bagikan',
-  'Router limit reached for this account (:n).': 'Batas router akun ini tercapai (:n).',
   'Router limit reached for this workspace.': 'Batas router workspace ini tercapai.',
   'Router not found.': 'Router tidak ditemukan.',
-  'A demo router cannot be shared.': 'Router demo tidak bisa dibagikan.',
-  'Unknown target workspace.': 'Workspace tujuan tidak dikenal.',
   'Share not found.': 'Pembagian tidak ditemukan.',
   'Welcome to NextMON': 'Selamat datang di NextMON',
   'This account has no router yet. Connect your MikroTik through the RouterOS API, or explore NextMON with a simulated router first.':

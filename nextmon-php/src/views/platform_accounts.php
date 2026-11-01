@@ -18,7 +18,7 @@
 <section class="card glass">
   <div class="table-wrap">
     <table class="tbl resp">
-      <thead><tr><th><?= e(t('Name')) ?></th><th><?= e(t('Slug')) ?></th><th><?= e(t('Status')) ?></th><th><?= e(t('Owner')) ?></th><th><?= e(t('Users')) ?></th><th><?= e(t('Routers')) ?></th><th><?= e(t('Limits')) ?></th><th><span class="sr-only"><?= e(t('Actions')) ?></span></th></tr></thead>
+      <thead><tr><th><?= e(t('Name')) ?></th><th><?= e(t('Slug')) ?></th><th><?= e(t('Status')) ?></th><th><?= e(t('Owner')) ?></th><th><?= e(t('Users')) ?></th><th><?= e(t('Routers')) ?></th><th><?= e(t('Usage')) ?></th><th><?= e(t('Limits')) ?></th><th><span class="sr-only"><?= e(t('Actions')) ?></span></th></tr></thead>
       <tbody>
       <?php foreach ($rows as $w) { $susp = ($w['status'] ?? 'active') === 'suspended'; ?>
         <tr>
@@ -28,6 +28,7 @@
           <td data-label="<?= e(t('Owner')) ?>"><?= e($w['owner_name'] ?: '-') ?></td>
           <td data-label="<?= e(t('Users')) ?>"><?= (int)$w['user_count'] ?></td>
           <td data-label="<?= e(t('Routers')) ?>"><?= (int)$w['router_count'] ?> / <?= (int)$w['eff']['routers'] ?: '&infin;' ?></td>
+          <td data-label="<?= e(t('Usage')) ?>"><?= e(t('Vouchers today')) ?>: <?= (int)$w['vq']['used'] ?>/<?= $w['vq']['limit'] ? (int)$w['vq']['limit'] : '&infin;' ?><br><span class="muted"><?= e(t('Log rows')) ?>: <?= (int)$w['lq']['used'] ?>/<?= $w['lq']['limit'] ? (int)$w['lq']['limit'] : '&infin;' ?></span></td>
           <td data-label="<?= e(t('Limits')) ?>">
             <form class="inline-form row" method="post" action="<?= e(url('/platform/accounts/limits')) ?>" style="gap:var(--s1)">
               <?= csrf_field() ?><input type="hidden" name="id" value="<?= e($w['id']) ?>">

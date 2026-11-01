@@ -1,4 +1,5 @@
 /** Port of ImportController preview / commit / cancel. */
+import { check, QuotaError, release, reserve } from '../../lib/quota.ts';
 import { audit } from '../_kit/audit.ts';
 import { str, UserError } from '../_kit/forms.ts';
 import type { FormRoute } from '../_kit/forms.ts';
@@ -56,6 +57,20 @@ export const importForms: Record<string, FormRoute> = {
       const r = ctx.driver();
       const existing = new Map<string, string>();
       for (const u of await r.print('/ip/hotspot/user', {}, ['name'])) existing.set(u.name ?? '', u['.id'] ?? '');
+      // daily voucher limit: the whole file is refused when the new users would not fit (a dry run only checks, a real run reserves)
+      const fresh = new Set<string>();
+      for (const row of j.rows) {
+        const nm = row.d.name ?? '';
+        if (row.st !== 'error' && nm !== '' && !existing.has(nm)) fresh.add(nm);
+      }
+      let quota: ReturnType<typeof reserve> = null;
+      try {
+        if (dry) check(fresh.size);
+        else quota = reserve(fresh.size);
+      } catch (e) {
+        if (e instanceof QuotaError) throw new UserError(t(e.key, e.params), '/import/preview?t=' + token);
+        throw e;
+      }
       const res: Result = { added: 0, updated: 0, skipped: 0, errors: 0, dry, mode, file: j.file, ts: Math.floor(Date.now() / 1000), rowErrors: [] };
       // Router writes are queued and sent pipelined; per-row error reporting is kept. A name that appears twice in the file
       // flushes the queue first so the second row sees the id of the first (same result as a row-by-row loop).
@@ -138,6 +153,7 @@ export const importForms: Record<string, FormRoute> = {
         }
       } finally {
         await flush(); // also when the loop was cut short by an exception: whatever was queued still goes out
+        release(quota, fresh.size - res.added); // rows that failed / were skipped / never ran give their units back
       }
       res.rowErrors = errs.sort((a, b) => a[0] - b[0]).map((e) => e[1]);
       Imp.saveResult(token, res);

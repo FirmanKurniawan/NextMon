@@ -9,6 +9,7 @@ import { Cache } from './cache.ts';
 import { Context } from './context.ts';
 import type { Driver } from './driver.ts';
 import { Net } from './net.ts';
+import { QuotaError } from './quota.ts';
 import { Routers } from './routers.ts';
 import { RouterOSError } from './routeros.ts';
 import { Sales } from './sales.ts';
@@ -28,7 +29,7 @@ export function presentedKey(h: Headers): string {
   return m?.[1] ?? '';
 }
 
-async function readBody(req: Request): Promise<Record<string, unknown>> {
+export async function readBody(req: Request): Promise<Record<string, unknown>> {
   if (req.method !== 'POST') return Object.fromEntries(new URL(req.url).searchParams);
   const text = await req.text();
   if (text.length > 256 * 1024) return {};
@@ -64,13 +65,14 @@ export async function handleV1(req: Request, rest: string[]): Promise<Response> 
       return json(out, out.ok === false ? 400 : 200);
     } catch (e) {
       if (e instanceof RouterOSError) return json({ ok: false, error: e.message }, 502);
+      if (e instanceof QuotaError) return json({ ok: false, error: e.message, used: e.used, limit: e.limit }, 429); // daily voucher limit
       console.error('[nextmon] api/v1 error', e);
       return json({ ok: false, error: 'Server error' }, 500);
     }
   });
 }
 
-async function resource(name: string, req: Request, r: Driver, rid: string, input: Record<string, unknown>, canWrite: boolean, ws: string): Promise<Record<string, unknown>> {
+export async function resource(name: string, req: Request, r: Driver, rid: string, input: Record<string, unknown>, canWrite: boolean, ws: string): Promise<Record<string, unknown>> {
   const limit = Math.max(1, Math.min(1000, Number(input.limit) || 200));
   const settings = getSettings();
   const tz = String(settings.timezone || 'UTC');

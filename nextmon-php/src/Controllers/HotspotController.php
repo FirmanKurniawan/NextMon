@@ -135,7 +135,7 @@ class HotspotController
             Audit::log('user.edit', $name);
         } else {
             $attrs = array_filter($attrs, fn($v) => $v !== '');
-            $r->add('/ip/hotspot/user', $attrs);
+            Quota::guard(1, fn() => $r->add('/ip/hotspot/user', $attrs));   // counts toward the daily voucher limit
             Audit::log('user.add', $name);
         }
         App::back('/hotspot/users', t('User saved.'));

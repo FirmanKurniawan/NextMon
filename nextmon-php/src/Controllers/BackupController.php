@@ -3,9 +3,109 @@ class BackupController
 {
     public static function index(): void
     {
-        $r = App::driver();
-        $files = array_values(array_filter($r->print('/file', [], ['name', 'type', 'size', 'creation-time']), fn($f) => preg_match('/\.(rsc|backup)$/i', $f['name'] ?? '')));
-        App::render('backup', ['title' => t('Backup'), 'page' => 'backup', 'files' => $files]);
+        $hasRouter = App::currentRouterId() !== '';   // app-data restore must work on an empty workspace too
+        $files = [];
+        if ($hasRouter) {
+            $files = array_values(array_filter(App::driver()->print('/file', [], ['name', 'type', 'size', 'creation-time']), fn($f) => preg_match('/\.(rsc|backup)$/i', $f['name'] ?? '')));
+        }
+        $admin = Auth::can('admin');
+        App::render('backup', [
+            'title' => t('Backup'), 'page' => 'backup', 'files' => $files, 'hasRouter' => $hasRouter, 'admin' => $admin,
+            'pending' => $admin ? Backup::pending((string)(Auth::user()['id'] ?? '')) : null,
+            'safety' => $admin ? Backup::safetyFiles() : [],
+        ]);
+    }
+
+    // ---- app data (workspace) backup / restore: owner only, see Backup.php and docs/BACKUP-FORMAT.md ----------------------
+
+    private static function limited(string $bucket, int $max): void
+    {
+        if (Net::hit($bucket, Workspace::id() . '|' . (Auth::user()['id'] ?? ''), $max, 600)) {
+            App::redirect('/backup', t('Too many attempts. Try again in :m min.', [':m' => 10]), 'err');
+        }
+    }
+
+    public static function appExport(): void
+    {
+        self::limited('backup-export', 10);
+        $secrets = App::get('secrets') === '1';
+        try {
+            $body = Backup::export($secrets);
+        } catch (Throwable $e) {
+            App::redirect('/backup', $e instanceof BackupError ? $e->getMessage() : t('Server error'), 'err');
+        }
+        Audit::log('backup.export', $secrets ? 'with encrypted secrets' : 'no secrets');
+        self::send('nextmon-data-' . date('Ymd-His') . '.json', 'application/json');
+        echo $body;
+        exit;
+    }
+
+    public static function safetyDownload(): void
+    {
+        $f = Backup::safetyPath(App::get('name'));
+        if (!$f) {
+            App::redirect('/backup', t('File not found.'), 'err');
+        }
+        Audit::log('backup.safety.download', basename($f));
+        self::send(basename($f), 'application/json');
+        readfile($f);
+        exit;
+    }
+
+    /** Step 1: upload + full validation. Nothing is written except the pending preview. */
+    public static function restorePreview(): void
+    {
+        self::limited('backup-restore', 12);
+        $f = $_FILES['file'] ?? null;
+        if (!$f || !is_array($f) || ($f['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+            App::redirect('/backup', t('Choose a backup file first.'), 'err');
+        }
+        if ($f['error'] === UPLOAD_ERR_INI_SIZE || $f['error'] === UPLOAD_ERR_FORM_SIZE || $f['size'] > Backup::MAX_BYTES) {
+            App::redirect('/backup', t('File is too large (max :n MB).', [':n' => Backup::MAX_BYTES / 1048576]), 'err');
+        }
+        if ($f['error'] !== UPLOAD_ERR_OK || !is_uploaded_file($f['tmp_name'])) {
+            App::redirect('/backup', t('Upload failed.'), 'err');
+        }
+        $raw = (string)file_get_contents($f['tmp_name'], false, null, 0, Backup::MAX_BYTES + 1);
+        try {
+            $parsed = Backup::parse($raw);
+        } catch (BackupError $e) {
+            Audit::log('backup.restore.rejected', mb_substr($e->getMessage(), 0, 200));
+            App::redirect('/backup', $e->getMessage(), 'err');
+        }
+        Backup::stash($parsed, (string)$f['name'], (string)(Auth::user()['id'] ?? ''));
+        Audit::log('backup.restore.preview', (string)$f['name']);
+        App::redirect('/backup#restore');
+    }
+
+    public static function restoreCancel(): void
+    {
+        Backup::discard();
+        App::redirect('/backup', t('Restore cancelled. Nothing was changed.'));
+    }
+
+    /** Step 2: explicit confirmation (typed word + token), then safety backup + atomic replace. */
+    public static function restoreApply(): void
+    {
+        self::limited('backup-restore', 12);
+        $uid = (string)(Auth::user()['id'] ?? '');
+        $data = Backup::pendingData($uid, App::post('token'));
+        if ($data === null) {
+            App::redirect('/backup', t('The restore preview expired. Upload the file again.'), 'err');
+        }
+        if (strtoupper(App::post('confirm')) !== 'RESTORE') {
+            App::redirect('/backup#restore', t('Type RESTORE to confirm.'), 'err');
+        }
+        $sel = array_values(array_filter(array_map('strval', (array)($_POST['c'] ?? [])), fn($c) => isset(Backup::COLLECTIONS[$c])));
+        try {
+            $r = Backup::apply($data, $sel);
+        } catch (BackupError $e) {
+            Audit::log('backup.restore.failed', mb_substr($e->getMessage(), 0, 200));
+            App::redirect('/backup#restore', $e->getMessage(), 'err');
+        }
+        Backup::discard();
+        Audit::log('backup.restore', implode(',', $r['applied']) . ' safety=' . $r['safety']);
+        App::redirect('/backup', t('Restore complete: :c. Previous data saved as :f', [':c' => implode(', ', $r['applied']), ':f' => $r['safety']]));
     }
 
     public static function create(): void

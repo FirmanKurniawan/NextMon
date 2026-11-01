@@ -30,19 +30,7 @@ export function Badge({ kind = 'neutral', children }: { kind?: string; children:
   return <span className={'badge badge-' + kind}>{children}</span>;
 }
 
-export function NoRouter({ t }: { t: TFn }) {
-  return (
-    <div className="card glass">
-      <div className="card-b">
-        <Empty icon="router" title={t('No router configured')} text={t('Add a router first.')}>
-          <a className="btn btn-primary" href="/routers">
-            {t('Routers')}
-          </a>
-        </Empty>
-      </div>
-    </div>
-  );
-}
+export { default as NoRouter } from '../_kit/NoRouter';
 
 export const paginate = <T,>(rows: T[], per: number, raw: string | string[] | undefined): { page: T[]; pg: number; pages: number } => {
   const pages = Math.max(1, Math.ceil(rows.length / per));

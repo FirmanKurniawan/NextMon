@@ -94,11 +94,4 @@ export function RoNotice({ t }: { t: (k: string) => string }) {
   );
 }
 
-export function NoRouter({ t }: { t: (k: string) => string }) {
-  return (
-    <div className="empty">
-      <Icon name="router" size={32} />
-      <h3>{t('No router configured')}</h3>
-    </div>
-  );
-}
+export { default as NoRouter } from '../_kit/NoRouter';

@@ -426,6 +426,24 @@ class ImportController
         foreach ($r->print('/ip/hotspot/user', [], ['name']) as $u) {
             $existing[$u['name']] = $u['.id'];
         }
+        // daily voucher limit: the whole file is refused when the new users would not fit (a dry run only checks, a real run reserves)
+        $new = [];
+        foreach ($j['rows'] as $row) {
+            $nm = (string)($row['d']['name'] ?? '');
+            if ($row['st'] !== 'error' && $nm !== '' && !isset($existing[$nm])) {
+                $new[$nm] = true;
+            }
+        }
+        $quota = null;
+        try {
+            if ($dry) {
+                Quota::check(count($new));
+            } else {
+                $quota = Quota::reserve(count($new));
+            }
+        } catch (QuotaException $qe) {
+            App::redirect('/import/preview?t=' . $token, $qe->getMessage(), 'err');
+        }
         $res = ['added' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => 0, 'dry' => $dry, 'mode' => $mode, 'file' => $j['file'], 'ts' => time(), 'rowErrors' => []];
         // Router writes are queued and sent pipelined (100 rows per round-trip) instead of one round-trip per row.
         // Per-row error reporting is unchanged; a name that appears twice in the file flushes the queue first so the
@@ -517,6 +535,7 @@ class ImportController
             }
         } finally {
             $flush();   // also when the loop was cut short by an exception: whatever was queued still goes out
+            Quota::release($quota, count($new) - $res['added']);   // rows that failed / were skipped / never ran give their units back
         }
         usort($errs, fn($x, $y) => $x[0] <=> $y[0]);
         foreach ($errs as $e) {

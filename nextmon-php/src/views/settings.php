@@ -29,6 +29,10 @@ $tabs = ['general' => 'General', 'account' => 'My account'] + ($admin ? ['users'
     <hr style="border:0;border-top:1px solid var(--border);margin:var(--s5) 0">
     <dl class="kv" style="max-width:560px">
       <dt><?= e(t('Demo mode')) ?></dt><dd><?= $forced ? badge('NEXTMON_DEMO=1', 'warn') : '<span class="muted">' . e(t('per router')) . '</span>' ?></dd>
+      <dt><?= e(t('Plan limits')) ?></dt><dd>
+        <?php $pl = ['routers' => t('Routers'), 'staff' => t('Staff accounts'), 'vouchers' => t('Vouchers today'), 'log_rows' => t('Log rows')]; $pi = 0;
+        foreach ($pl as $k => $lbl) { $u = $plan[$k]; echo ($pi++ ? ' &middot; ' : '') . e($lbl) . ': ' . (int)$u['used'] . '/' . ($u['limit'] === 0 ? e(t('unlimited')) : (int)$u['limit']); } ?>
+      </dd>
       <dt>PHP</dt><dd class="mono"><?= e(PHP_VERSION) ?></dd>
       <dt>OpenSSL</dt><dd><?= function_exists('openssl_encrypt') ? badge(t('available'), 'ok') : badge(t('missing'), 'err') ?></dd>
       <dt>cURL</dt><dd><?= function_exists('curl_init') ? badge(t('available'), 'ok') : badge(t('not available (fallback used)'), 'warn') ?></dd>
@@ -110,7 +114,7 @@ POST /api/v1/kick      {"user":"abc123"}                                        
     <div class="modal-h"><h2 id="dlg-usr-t"><?= e(t('Dashboard user')) ?></h2><button type="button" class="btn btn-ghost btn-icon" data-close aria-label="<?= e(t('Close')) ?>"><?= icon('x') ?></button></div>
     <div class="modal-b"><div class="form-grid">
       <div class="field"><label for="du-name"><?= e(t('Username')) ?></label><input class="input" id="du-name" name="username" required pattern="[A-Za-z0-9_.\-]{3,32}"></div>
-      <div class="field"><label for="du-role"><?= e(t('Role')) ?></label><select class="select" id="du-role" name="role"><?php foreach (Auth::ROLES as $r) { ?><option value="<?= $r ?>"><?= e(Auth::roleLabel($r)) ?></option><?php } ?></select></div>
+      <div class="field"><label for="du-role"><?= e(t('Role')) ?></label><select class="select" id="du-role" name="role"><?php foreach (Auth::ROLES as $r) { ?><option value="<?= $r ?>"<?= sel($r, "operator") ?>><?= e(Auth::roleLabel($r)) ?></option><?php } ?></select></div>
       <div class="field full"><label for="du-pass"><?= e(t('Password')) ?></label><input class="input" id="du-pass" name="password" type="password" autocomplete="new-password" minlength="8"><p class="help"><?= e(t('8+ characters. When editing, leave blank to keep the current password.')) ?></p></div>
     </div></div>
     <div class="modal-f"><button type="button" class="btn" data-close><?= e(t('Cancel')) ?></button><button class="btn btn-primary"><?= e(t('Save')) ?></button></div>

@@ -123,7 +123,7 @@ describe('voucher generator', () => {
   });
   it('generate: qty, prefix, uniqueness, vc mode user==pass, comment format, users created on the driver', async () => {
     const r = demo('gen1');
-    const o = await generate(r, { profile: 'default', qty: 120, prefix: 'ab-', length: 5, charset: 'num', mode: 'vc', batch: 'Test 1' });
+    const o = await Workspace.run(WS, () => generate(r, { profile: 'default', qty: 120, prefix: 'ab-', length: 5, charset: 'num', mode: 'vc', batch: 'Test 1' })); // generate() counts toward the workspace quota
     expect(o.items).toHaveLength(120);
     expect(new Set(o.items.map((i) => i[0])).size).toBe(120);
     for (const [n, p] of o.items) {

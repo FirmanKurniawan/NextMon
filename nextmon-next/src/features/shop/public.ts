@@ -14,6 +14,7 @@ import { Context } from '../../lib/context.ts';
 import { safeEqual } from '../../lib/crypto.ts';
 import { getSettings } from '../../lib/store.ts';
 import { Workspace } from '../../lib/workspace.ts';
+import { Reseller } from '../../lib/reseller.ts';
 import { Orders } from '../orders/orders.ts';
 import type { Order } from '../orders/orders.ts';
 import { PaymentError, Payments } from './gateways.ts';
@@ -56,13 +57,14 @@ export const look = (): Look => {
   return { lang: s.lang, currency: String(s.currency || 'Rp'), tz: String(s.timezone || 'UTC'), wq: Shop.wQuery(), slug: Workspace.get(id)?.slug ?? '' };
 };
 
-export type StoreView = { c: ShopConfig; title: string; packages: ReturnType<typeof Shop.activePackages> } & Look;
-export function storeView(): StoreView {
+export type StoreView = { c: ShopConfig; title: string; packages: ReturnType<typeof Shop.activePackages>; ref: string } & Look;
+/** `ref` = the referral code from the link when it names an active reseller of this workspace, else '' (echoed into the order form). */
+export function storeView(ref = ''): StoreView {
   const c = Shop.config();
-  return { c, title: Shop.title(c), packages: c.enabled ? Shop.activePackages(c) : [], ...look() };
+  return { c, title: Shop.title(c), packages: c.enabled ? Shop.activePackages(c) : [], ref: Reseller.byRef(ref)?.code ?? '', ...look() };
 }
 
-export type CreateInput = { name: string; phone: string; email: string; package: string; terms: string; website: string; ip: string; origin: string; host: string };
+export type CreateInput = { name: string; phone: string; email: string; package: string; terms: string; website: string; ref?: string; ip: string; origin: string; host: string };
 export type Old = { name: string; phone: string; email: string; package: string };
 export type CreateOut = { ok: true; to: string } | { ok: false; error: string; old: Old };
 
@@ -92,7 +94,9 @@ export async function createOrder(i: CreateInput): Promise<CreateOut> {
   const router = Shop.router(c);
   if (!gw || !router || (c.gateway === 'mock' && c.env !== 'sandbox')) return fail('The shop is not configured yet.');
 
-  let o = Orders.create(pkg, { name, phone, email }, c.gateway, Math.trunc(c.expiry_minutes), router.id);
+  // Referral: attribution only. Unknown / inactive code = ignored silently. Commission needs a PAID, verified order total.
+  const hit = Reseller.byRef(i.ref ?? '');
+  let o = Orders.create(pkg, { name, phone, email }, c.gateway, Math.trunc(c.expiry_minutes), router.id, hit);
   try {
     const r = await gw.create(o, Shop.gwCfg(c, c.gateway), {
       return_url: i.origin + Shop.orderPath(o),

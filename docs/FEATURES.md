@@ -95,3 +95,12 @@ Izin = policy RouterOS minimum pada group API user (`read`, `write`, `api`, `tes
 
 Prinsip: user API khusus per router, dibatasi `address=<IP server NextMON>/32`, tanpa `winbox/ssh/telnet/web`
 policy, password acak 24+ karakter. Lihat `mikrotik-scripts/07-api-user-least-privilege.rsc`.
+
+## 6. Penjualan reseller lewat toko publik (PHP + Next, perilaku identik)
+
+- Reseller punya **kode referal** (3-24 karakter a-z, 0-9, `-`; unik per workspace) yang diatur admin di halaman Reseller; tautan toko: `/shop?w=<slug>&ref=<kode>` (tampil juga di Dompet saya).
+- `ref` adalah satu-satunya nilai pilihan klien dan HANYA menandai pesanan (`order.attr`): tidak pernah mengubah workspace, harga, atau produk. Kode tak dikenal / reseller nonaktif / kode workspace lain diabaikan diam-diam (pesanan tetap jalan tanpa atribusi).
+- Komisi dikreditkan ke buku besar dompet reseller (tipe `commission`, `ref` = id pesanan, meta `order`) saat pesanan LUNAS dan voucher terkirim: `round(total pesanan x persen komisi)`, dihitung di server dari total pesanan yang terverifikasi (nominal webhook harus sama). Toko tidak punya markup harga (pengaturan "price adj." hanya untuk POS/voucher), jadi mode kedua tidak dipakai.
+- Tepat sekali: dijaga kunci per-pesanan + flag `attr.credited_at` + guard buku besar (`once`, tipe+ref). Replay webhook, callback paralel, dan retry tidak menggandakan. Refund pesanan membalik komisi tepat sekali (entri `commission` negatif, `ref = rev:<id pesanan>`).
+- Admin: detail pesanan menampilkan reseller + status komisi (menunggu / dikreditkan / dibatalkan); buku besar menautkan ke pesanan; CSV pesanan memuat `reseller_ref` dan `commission`.
+- Tes: `nextmon-php/tests/unit/ShopResellerTest.php`, `nextmon-next/tests/unit/shop-reseller.test.ts`.

@@ -29,7 +29,7 @@ $typeBadge = ['topup' => 'ok', 'sale' => 'info', 'refund' => 'warn', 'commission
         <td data-label="<?= e(t('Time')) ?>" class="mono nowrap"><?= e(date('Y-m-d H:i', $r['ts'])) ?></td>
         <td data-label="<?= e(t('Reseller')) ?>"><?= e($names[$r['uid']] ?? '?') ?></td>
         <td data-label="<?= e(t('Type')) ?>"><?= badge(t(ucfirst($r['type'])), $typeBadge[$r['type']] ?? 'neutral') ?></td>
-        <td data-label="<?= e(t('Note')) ?>" class="wrap"><?= e($r['note']) ?><?= isset($refunded[$r['id']]) ? ' ' . badge(t('Refunded'), 'warn') : '' ?></td>
+        <td data-label="<?= e(t('Note')) ?>" class="wrap"><?= e($r['note']) ?><?= !empty($r['meta']['order']) ? ' <a class="mono" href="' . e(url('/orders/view?id=' . rawurlencode($r['meta']['order']))) . '">' . e($r['meta']['order']) . '</a>' : '' ?><?= isset($refunded[$r['id']]) ? ' ' . badge(t('Refunded'), 'warn') : '' ?></td>
         <td data-label="<?= e(t('Amount')) ?>" class="num mono <?= $r['amount'] < 0 ? 'rs-neg' : 'rs-pos' ?>"><?= e(($r['amount'] > 0 ? '+' : '') . number_format($r['amount'], 0, ',', '.')) ?></td>
         <td data-label="<?= e(t('Balance')) ?>" class="num mono"><?= e(number_format($r['bal'], 0, ',', '.')) ?></td>
         <td data-label="<?= e(t('By')) ?>"><?= e($r['by']) ?></td>

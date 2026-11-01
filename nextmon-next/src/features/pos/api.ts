@@ -1,4 +1,5 @@
 import { Notify } from '../../lib/notify.ts';
+import { QuotaError } from '../../lib/quota.ts';
 import { Reseller } from '../../lib/reseller.ts';
 import { Scripts } from '../../lib/scripts.ts';
 import { getSettings, Store } from '../../lib/store.ts';
@@ -41,6 +42,7 @@ export const posApi: ApiRoute = {
       res = await generate(r, { profile, qty: 1, length: 6, charset: 'lowernum', mode: 'vc', batch: 'POS' });
     } catch (e) {
       if (tk) Reseller.rollback(tk, 'pos error');
+      if (e instanceof QuotaError) return jsonResponse({ ok: false, error: ctx.t(e.key, e.params), used: e.used, limit: e.limit }, 429); // daily voucher limit
       throw e;
     }
     Reseller.recordBatch(actor, res.comment);

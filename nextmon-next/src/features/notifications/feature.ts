@@ -2,7 +2,7 @@ import { defineFeature } from '../types.ts';
 
 export default defineFeature({
   id: 'notifications',
-  nav: [{ key: 'notifications', href: '/notifications', icon: 'bell', label: 'Notifications', group: 'System', cap: 'admin', order: 91 }],
+  nav: [{ key: 'notifications', href: '/notifications', icon: 'bell', label: 'Notifications', group: 'System', cap: 'admin', order: 20 }],
   pages: [{ path: '/notifications', title: 'Notifications', cap: 'admin', page: 'notifications', component: () => import('./page.tsx') }],
   i18n: {
     id: {

@@ -13,6 +13,10 @@
   <section class="card glass col-3"><div class="card-b"><div class="stat-label"><?= e(t('Commission this month')) ?></div><div class="stat-value rs-pos"><?= e(money($sum['comm_month'])) ?></div><div class="stat-sub"><?= e(t('Total :c', [':c' => money($sum['comm_total'])])) ?></div></div></section>
 </div>
 
+<?php if (!empty($shopLink)) { ?>
+<div class="alert info" style="margin-bottom:var(--s4)"><?= icon('cart', 18) ?><div><?= e(t('Your shop link (earn commission on paid shop orders):')) ?> <span class="mono"><?= e($shopLink) ?></span></div></div>
+<?php } ?>
+
 <?php if ($plist) { ?>
 <section class="card glass" style="margin-bottom:var(--s4)">
   <div class="card-h"><h2><?= e(t('My price list')) ?></h2><a class="btn btn-sm btn-primary" href="<?= e(url('/pos')) ?>"><?= icon('cart', 16) ?><?= e(t('Quick sell (POS)')) ?></a></div>

@@ -126,6 +126,11 @@ npm run build        # next build + postbuild (standalone siap: node .next/stand
 npm run sync-assets  # salin CSS/JS/ikon dari ../nextmon-php/public (jangan restyle)
 npm run cli -- rekey # rotasi kunci enkripsi (hentikan server dulu)
 npm run cli -- doctor
+npm run cli -- crypto:rotate        # sama dengan rekey
+npm run cli -- storage:status | storage:vacuum
+npm run cli -- tenant:list | tenant:status
+npm run cli -- cache:clear
+npm run cli -- cron [--list] [--job=NAME] [--workspace=ID] [--force] [--quiet]
 ```
 
 Test baru: letakkan di `tests/unit/*.test.ts`; `tests/setup.ts` memberi direktori data sementara per file. Untuk RouterOS gunakan `tests/fixtures/fake-routeros.ts`; untuk tenant gunakan `tests/helpers.ts` (`bootstrapPlatform`, `makeTenant`, `addStaff`).

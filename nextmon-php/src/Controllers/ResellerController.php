@@ -84,6 +84,18 @@ class ResellerController
         App::redirect('/resellers', t('Reseller saved.'));
     }
 
+    public static function saveRef(): void
+    {
+        $id = App::post('id');
+        $u = self::userById($id);
+        if (!$u || $u['role'] !== 'reseller') {
+            App::redirect('/resellers', t('User not found.'), 'err');
+        }
+        $err = Reseller::setRef($id, App::post('ref'));
+        Audit::log('reseller.ref', $u['username'] . ($err === '' ? '' : ' failed'));
+        App::redirect('/resellers', $err === '' ? t('Referral code saved.') : $err, $err === '' ? 'ok' : 'err');
+    }
+
     public static function fund(): void
     {
         $id = App::post('id');
@@ -185,6 +197,7 @@ class ResellerController
         }
         App::render('wallet', [
             'title' => t('My wallet'), 'page' => 'wallet', 'isRs' => true, 'cfg' => $cfg, 'bal' => Reseller::balance($me['id']),
+            'shopLink' => ($cfg['ref'] ?? '') !== '' ? '/shop' . Shop::wQuery() . (Shop::wQuery() === '' ? '?' : '&') . 'ref=' . $cfg['ref'] : '',
             'sum' => Reseller::summary($me['id']), 'rows' => $page, 'pg' => $pg, 'pages' => $pages, 'total' => count($rows), 'f' => $f, 'plist' => $list,
         ]);
     }

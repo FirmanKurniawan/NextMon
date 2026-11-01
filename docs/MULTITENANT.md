@@ -107,3 +107,9 @@ Otomatis pada `Store::backend()` pertama bila `data/tenant.migrated` belum ada (
 ## Berkas non-dokumen yang tetap global (disengaja)
 `secret.key` (satu kunci platform), `cron.lock`, `sessions/`, `cache/routes.php` & `cache/lang-*.ser` (tanpa data tenant), `cache/rc-*.json` (penanda soket/breaker per perangkat+kredensial), `cache/c-*.dat` (kunci sudah berprefix workspace).
 Semua yang lain per-workspace melalui `Workspace::dir()`.
+
+---
+## Batas pemakaian yang ditegakkan (`vouchers_per_day`, `log_rows`)
+- **Voucher per hari** (PHP `src/Quota.php`, Next `src/lib/quota.ts`): hitungan per workspace per hari (dok `quota` `{day, used}`; hari menurut zona waktu pengaturan workspace). `Quota::reserve(n)` memeriksa + menambah dalam satu `Store::update` (terkunci) sehingga permintaan paralel/terpecah tidak bisa melewati batas; bila `used + n > limit` seluruh batch ditolak (`QuotaException` / `QuotaError`; pesan menampilkan terpakai/batas, HTTP 429 untuk JSON). `release()` mengembalikan jatah bila pembuatan gagal. Dipasang di `Voucher::generate` (voucher, POS, reseller, API v1), tambah pengguna manual, impor CSV (seluruh file ditolak; dry-run hanya memeriksa) dan pemenuhan pesanan toko (gagal = `fulfil_err`, bisa diulang). 0 = tak terbatas; `main` tak terbatas.
+- **Ukuran log** (`log_rows`): `audit.log`, `notify.log`, `alerts.log`, `wizard.log` per workspace dipangkas (baris tertua) saat append. SQLite / Next: tepat, lewat indeks; JSON PHP: berkas `<log>.cnt` menyimpan jumlah baris dan dipangkas saat melewati batas + 10%. `platform_audit`, ledger dompet, dan log POS tidak dipangkas.
+- Pemakaian vs batas tampil di Pengaturan (blok "Batas paket") dan halaman Akun platform.

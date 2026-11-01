@@ -27,6 +27,7 @@ export default function OrderForm({
   action,
   csrf,
   slug,
+  refCode,
   packs,
   labels,
   requirePhone,
@@ -36,6 +37,7 @@ export default function OrderForm({
   action: (fd: FormData) => Promise<PlaceResult>;
   csrf: string;
   slug: string;
+  refCode?: string;
   packs: Pack[];
   labels: FormLabels;
   requirePhone: boolean;
@@ -83,6 +85,7 @@ export default function OrderForm({
       <form method="post" className="shp-form" id="shop-form" autoComplete="on" onSubmit={onSubmit}>
         <input type="hidden" name="_csrf" value={csrf} />
         <input type="hidden" name="w" value={slug} />
+        {refCode ? <input type="hidden" name="ref" value={refCode} /> : null}
         <div className="shp-hp" aria-hidden="true">
           <label>
             Website

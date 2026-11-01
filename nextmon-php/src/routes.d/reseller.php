@@ -3,6 +3,7 @@
 return [
     'GET /resellers' => ['ResellerController', 'index', 'admin'],
     'POST /resellers/save' => ['ResellerController', 'save', 'admin'],
+    'POST /resellers/ref' => ['ResellerController', 'saveRef', 'admin'],
     'POST /resellers/fund' => ['ResellerController', 'fund', 'admin'],
     'POST /resellers/refund' => ['ResellerController', 'refund', 'admin'],
     'GET /resellers/ledger' => ['ResellerController', 'ledger', 'admin'],

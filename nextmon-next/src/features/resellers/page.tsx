@@ -7,7 +7,8 @@ import ActionForm from '../_sales/ActionForm';
 import Flash from '../_sales/Flash.tsx';
 import { Badge, Empty, PageHead } from '../_sales/ui';
 import type { PageProps } from '../types.ts';
-import { fundReseller, saveReseller } from './actions.ts';
+import { Shop } from '../shop/config.ts';
+import { fundReseller, saveRef, saveReseller } from './actions.ts';
 import { Assets, pct } from './ui.tsx';
 
 /** /resellers: resellers of this workspace with balance, commission and the top-up / settings dialogs. */
@@ -70,6 +71,7 @@ export default async function ResellersPage({ ctx, searchParams }: PageProps) {
                   <th className="num">{t('Commission')}</th>
                   <th className="num">{t('Price adj.')}</th>
                   <th>{t('Profiles')}</th>
+                  <th>{t('Shop referral')}</th>
                   <th>
                     <span className="sr-only">{t('Actions')}</span>
                   </th>
@@ -96,6 +98,15 @@ export default async function ResellersPage({ ctx, searchParams }: PageProps) {
                       </td>
                       <td data-label={t('Profiles')} className="wrap">
                         {d.allow_all ? <span className="muted">{t('All')}</span> : Object.keys(d.profiles).join(', ') || '-'}
+                      </td>
+                      <td data-label={t('Shop referral')} className="wrap">
+                        <ActionForm action={saveRef} className="row">
+                          <input type="hidden" name="_csrf" value={ctx.csrf} />
+                          <input type="hidden" name="id" value={u.id} />
+                          <input className="input input-sm mono" name="ref" defaultValue={c?.ref ?? ''} maxLength={24} pattern="[a-z0-9][a-z0-9\-]{2,23}" placeholder={t('code')} aria-label={t('Referral code')} style={{ width: '9rem' }} />
+                          <button className="btn btn-sm">{t('Save')}</button>
+                        </ActionForm>
+                        {c?.ref ? <div className="help mono">{'/shop' + Shop.wQuery() + (Shop.wQuery() === '' ? '?' : '&') + 'ref=' + c.ref}</div> : null}
                       </td>
                       <td className="actions" data-label="">
                         <button className="btn btn-sm btn-primary" type="button" data-open="#dlg-fund" data-rs-fund={u.id} data-name={u.username}>

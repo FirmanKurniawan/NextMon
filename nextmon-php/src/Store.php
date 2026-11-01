@@ -322,9 +322,17 @@ final class Store
 
     // ---- append-only collections ("logs": audit.log, notify.log, ledgers...) ---------------
 
+    /** Per-workspace log collections trimmed to the workspace's `log_rows` limit on append (ledgers / sales records are never trimmed). */
+    public const CAPPED_LOGS = ['audit.log', 'notify.log', 'alerts.log', 'wizard.log'];
+
     public static function appendLog(string $file, array $row): void
     {
-        self::backend()->append(self::key($file), $row);
+        $key = self::key($file);
+        $cap = 0;
+        if (in_array(self::sanitize($file), self::CAPPED_LOGS, true)) {
+            $cap = (int)(Workspace::limits()['log_rows'] ?? 0);   // 0 = unlimited (also `main`); global logs never get here
+        }
+        self::backend()->append($key, $row, max(0, $cap));
     }
 
     /** Newest first. */

@@ -1,6 +1,7 @@
 import { Icon } from '../../components/Icon';
 import { ApiKeys } from '../../lib/apikeys.ts';
 import { Env } from '../../lib/env.ts';
+import { logUsage, usage as voucherUsage } from '../../lib/quota.ts';
 import { Routers } from '../../lib/routers.ts';
 import { ASSIGNABLE_ROLES, staffUsage } from '../../lib/staff.ts';
 import { getSettings } from '../../lib/store.ts';
@@ -25,6 +26,9 @@ export default function SettingsPage({ ctx }: PageProps) {
   const keys = admin ? ApiKeys.list() : [];
   const lim = Workspace.limits(ws);
   const staff = staffUsage(ws);
+  const vq = voucherUsage(ws);
+  const lq = logUsage(ws);
+  const cap = (n: number) => (n === 0 ? t('unlimited') : n);
   const routerCount = Routers.list().filter((r) => !r.shared).length;
   const tabs: [string, string][] = [['general', 'General'], ['account', 'My account'], ...(admin ? ([['users', 'Users and roles'], ['api', 'API keys']] as [string, string][]) : [])];
   const csrf = <Csrf value={ctx.csrf} />;
@@ -107,7 +111,7 @@ export default function SettingsPage({ ctx }: PageProps) {
               <dd>{Env.demoForced() ? <Badge kind="warn">NEXTMON_DEMO=1</Badge> : <span className="muted">{t('per router')}</span>}</dd>
               <dt>{t('Plan limits')}</dt>
               <dd>
-                {t('Routers')}: {routerCount}/{lim.routers === 0 ? t('unlimited') : lim.routers} &middot; {t('Staff accounts')}: {staff.used}/{staff.max === 0 ? t('unlimited') : staff.max}
+                {t('Routers')}: {routerCount}/{cap(lim.routers)} &middot; {t('Staff accounts')}: {staff.used}/{staff.max === 0 ? t('unlimited') : staff.max} &middot; {t('Vouchers today')}: {vq.used}/{cap(vq.limit)} &middot; {t('Log rows')}: {lq.used}/{cap(lq.limit)}
               </dd>
               <dt>Node.js</dt>
               <dd className="mono">{process.version}</dd>

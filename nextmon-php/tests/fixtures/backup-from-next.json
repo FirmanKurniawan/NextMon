@@ -1,0 +1,21 @@
+{
+  "format": "nextmon-backup",
+  "version": 1,
+  "edition": "next",
+  "created": "2026-11-01T13:46:21Z",
+  "includes_secrets": false,
+  "counts": {
+    "routers": 1,
+    "settings": 3,
+    "shop": 1,
+    "resellers": 1,
+    "wallets": 1,
+    "wallet_ledger": 2,
+    "orders": 1
+  },
+  "checksum": {
+    "algo": "sha256",
+    "value": "0f47d438baf6bf9a1278f23bfcc67683b140b3d04ceecf5f8863d8c2afb86f70"
+  },
+  "payload": "{\"docs\":{\"routers\":[{\"id\":\"11111111\",\"name\":\"Next Router\",\"session\":\"nx\",\"type\":\"real\",\"host\":\"10.1.1.1\",\"port\":8728,\"ssl\":false,\"verify_tls\":false,\"user\":\"api\",\"pass\":\"\",\"hotspot_name\":\"Next WiFi\"}],\"settings\":{\"hotspot_name\":\"Next Fixture\",\"currency\":\"Rp\",\"templates\":[{\"id\":\"t1\",\"name\":\"Card\",\"html\":\"<div>{{user}}</div>\",\"w\":70,\"h\":40}]},\"shop\":{\"enabled\":true},\"resellers\":{\"u-1\":{\"commission\":10}},\"wallets\":{\"u-1\":12500}},\"logs\":{\"wallet_ledger\":[{\"id\":\"NL1\",\"ts\":100,\"uid\":\"u-1\",\"type\":\"topup\",\"amount\":20000,\"bal\":20000},{\"id\":\"NL2\",\"ts\":200,\"uid\":\"u-1\",\"type\":\"sale\",\"amount\":-7500,\"bal\":12500}]},\"orders\":[{\"id\":\"KL250101-ABCDEF-E7FBF63F\",\"token\":\"nexttoken12345\",\"created\":1700000000,\"updated\":1700000100,\"expires\":1700003600,\"status\":\"paid\",\"package\":{\"id\":\"p1\",\"profile\":\"1h\",\"price\":5000,\"label\":\"1 hour\"},\"amount\":5000,\"customer\":{\"name\":\"Next Customer\"},\"gateway\":\"mock\",\"router\":\"11111111\",\"ref\":\"\",\"pay_url\":\"\",\"pay_info\":\"\",\"voucher\":null,\"fulfil\":\"\",\"notes\":[],\"events\":[],\"ip\":\"1.2.3.4\"}]}"
+}

@@ -24,4 +24,8 @@ return [
     'Your reseller account is not set up yet. Ask the administrator to configure it and add balance.' => 'Akun reseller Anda belum diatur. Minta administrator mengatur dan mengisi saldo.', 'Your reseller account is disabled.' => 'Akun reseller Anda dinonaktifkan.',
     'My balance' => 'Saldo saya', 'Credit limit :c' => 'Batas kredit :c', 'Sold today' => 'Terjual hari ini', 'Sold this month' => 'Terjual bulan ini', 'Commission this month' => 'Komisi bulan ini', 'Total :c' => 'Total :c',
     'My price list' => 'Daftar harga saya', 'Customer price' => 'Harga pelanggan', 'I pay' => 'Saya bayar', 'Net margin' => 'Margin bersih', 'My transactions' => 'Transaksi saya', 'No transactions yet' => 'Belum ada transaksi',
+    'Shop referral' => 'Referal toko', 'Referral code' => 'Kode referal', 'code' => 'kode', 'Referral code saved.' => 'Kode referal disimpan.',
+    'Referral code: 3-24 characters, a-z, 0-9 and dash.' => 'Kode referal: 3-24 karakter, a-z, 0-9 dan tanda hubung.', 'This referral code is already used.' => 'Kode referal ini sudah dipakai.',
+    'Your shop link (earn commission on paid shop orders):' => 'Link toko Anda (dapat komisi dari pesanan toko yang lunas):', 'Reversed' => 'Dibatalkan', 'Credited' => 'Dikreditkan',
+    'Skipped (reseller inactive)' => 'Dilewati (reseller nonaktif)', 'Pending (paid and fulfilled)' => 'Menunggu (lunas dan terkirim)',
 ];

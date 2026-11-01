@@ -15,6 +15,8 @@ import { money } from './fmt.ts';
 import { I18n, isLang } from './i18n.ts';
 import { getSettings, Store } from './store.ts';
 import { zonedParts, zonedToTs } from './sales.ts';
+import { Users } from './users.ts';
+import { Workspace } from './workspace.ts';
 import type { Meta } from './scripts.ts';
 
 export const TYPES = ['topup', 'sale', 'refund', 'commission', 'adjustment'] as const;
@@ -30,6 +32,8 @@ export type ResellerCfg = {
   allow_all: boolean;
   /** allowed profile => own markup/discount % (null = use the reseller default) */
   profiles: Record<string, number | null>;
+  /** shop referral code (slug-safe, unique per workspace); managed by setRef() only */
+  ref?: string;
 };
 
 export type LedgerRow = {
@@ -88,8 +92,67 @@ export function saveCfg(uid: string, input: { active?: boolean; commission?: unk
     allow_all: !!input.allow_all,
     profiles,
   };
-  Store.update<Record<string, unknown>>('resellers', (a) => ({ ...a, [uid]: c }), {});
+  Store.update<Record<string, Partial<ResellerCfg>>>('resellers', (a) => ({ ...a, [uid]: { ...c, ref: String(a[uid]?.ref ?? '') } }), {});
   return c;
+}
+
+// ---- shop referral: ?ref=<code> only ATTRIBUTES an order to a reseller (never workspace / price / product) -----------
+
+export const REF_RE = /^[a-z0-9][a-z0-9-]{2,23}$/;
+
+/** Slug-safe form of a client-supplied code ('' when nothing usable is left). */
+export function cleanRef(s: string): string {
+  const v = Array.from(String(s)).slice(0, 60).join('').toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '');
+  return REF_RE.test(v) ? v : '';
+}
+
+/** Set (or clear with '') the referral code of a reseller. Unique per workspace. Returns '' on success, else an error message. */
+export function setRef(uid: string, code: string): string {
+  const c = code.trim().toLowerCase();
+  if (c !== '' && cleanRef(c) !== c) return tr('Referral code: 3-24 characters, a-z, 0-9 and dash.');
+  let err = '';
+  Store.update<Record<string, Partial<ResellerCfg>>>(
+    'resellers',
+    (a) => {
+      if (c !== '' && Object.entries(a).some(([id, x]) => id !== uid && x.ref === c)) {
+        err = tr('This referral code is already used.');
+        return a;
+      }
+      return { ...a, [uid]: { ...defaults(), ...(a[uid] ?? {}), ref: c } };
+    },
+    {},
+  );
+  return err;
+}
+
+export type RefHit = { uid: string; username: string; cfg: ResellerCfg; code: string };
+
+/** Active reseller owning referral `code` in the CURRENT workspace, or null (unknown / inactive / not a reseller user: ignored silently). */
+export function byRef(code: string): RefHit | null {
+  const k = cleanRef(code);
+  if (k === '') return null;
+  for (const [uid, raw] of Object.entries(all())) {
+    if (raw.ref !== k) continue;
+    const c = { ...defaults(), ...raw };
+    if (!c.active) return null;
+    const u = Users.inWorkspace(Workspace.id()).find((x) => x.id === uid && x.role === 'reseller');
+    return u ? { uid, username: u.username, cfg: c, code: k } : null;
+  }
+  return null;
+}
+
+/** Credit the shop commission of order `orderId` once (the ledger itself guards: type commission + ref = order id). */
+export function creditOrder(uid: string, orderId: string, amount: number, pct: string): { credited: number; already: boolean } {
+  if (amount <= 0) return { credited: 0, already: false };
+  const r = post(uid, [{ type: 'commission', amount, note: `Shop ${orderId} ${pct}%`, ref: orderId, meta: { via: 'shop', order: orderId }, once: true }], false, 'system');
+  return { credited: r.ok ? amount : 0, already: !r.ok };
+}
+
+/** Reverse a credited shop commission exactly once (ref "rev:<order id>"). Returns the amount reversed. */
+export function reverseOrder(uid: string, orderId: string, amount: number): number {
+  if (amount <= 0) return 0;
+  const r = post(uid, [{ type: 'commission', amount: -amount, note: `Shop refund ${orderId}`, ref: 'rev:' + orderId, meta: { via: 'shop', order: orderId, auto: 1 }, once: true }], false, 'system');
+  return r.ok ? amount : 0;
 }
 
 export const allowed = (c: ResellerCfg, profile: string): boolean => c.allow_all || Object.hasOwn(c.profiles, profile);
@@ -324,6 +387,6 @@ export function csv(list: LedgerRow[], names: Record<string, string>): string {
 }
 
 export const Reseller = {
-  TYPES, defaults, all, cfg, saveCfg, isReseller, allowed, adjFor, unitCost, commissionFor, basePrice, recordBatch, mayPrint, balance, balances,
+  TYPES, defaults, all, cfg, saveCfg, cleanRef, setRef, byRef, creditOrder, reverseOrder, isReseller, allowed, adjFor, unitCost, commissionFor, basePrice, recordBatch, mayPrint, balance, balances,
   post, topup, adjust, charge, isBlocked, rollback, refund, rows, summary, cell, csv, fmtTime,
 };

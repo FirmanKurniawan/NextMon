@@ -10,6 +10,7 @@
  */
 import { Context } from './context.ts';
 import { db } from './db.ts';
+import { singleton } from './singleton.ts';
 
 export class NoWorkspaceError extends Error {
   constructor(msg: string) {
@@ -79,6 +80,14 @@ function writeKey(k: string, data: unknown): void {
 
 export type Where = Record<string, string | number | boolean>;
 
+/** Per-workspace log collections trimmed to the workspace's `log_rows` limit on append (ledgers / sales records are never trimmed). */
+export const CAPPED_LOGS: readonly string[] = ['audit.log', 'notify.log', 'alerts.log', 'wizard.log'];
+/** workspace id -> log_rows limit (0 = unlimited). Registered by workspace.ts (store.ts cannot import it: cycle). */
+const logCapResolver = singleton<{ fn: ((ws: string) => number) | null }>('store.logcap', () => ({ fn: null }));
+export function setLogCapResolver(fn: (ws: string) => number): void {
+  logCapResolver.fn = fn;
+}
+
 export const Store = {
   isGlobal(name: string): boolean {
     return isGlobalName(sanitizeName(name));
@@ -128,6 +137,11 @@ export const Store = {
 
   append(collection: string, row: Record<string, unknown>): void {
     db().st('INSERT INTO logs(name, ts, data) VALUES(?,?,?)').run(key(collection), Math.floor(Date.now() / 1000), JSON.stringify(row));
+    const ws = Context.current().ws;
+    if (ws && logCapResolver.fn && CAPPED_LOGS.includes(sanitizeName(collection))) {
+      const cap = logCapResolver.fn(ws);
+      if (cap > 0) Store.prune(collection, cap); // exact, O(log n + cap) through the (name, id) index
+    }
   },
 
   /** Paged read, newest first. `where` = exact matches on top-level row keys. */
@@ -247,6 +261,11 @@ export const SETTING_DEFAULTS: Settings = {
   login_url: 'http://hotspot.local/login',
   max_qty: 500,
   live_report: true,
+  status_cors: '',
+  // Telegram: every event type is subscribed until the owner unticks it (same defaults as the PHP edition's Store::defaults())
+  telegram: { enabled: false, token: '', chat_id: '', events: ['sale', 'voucher', 'router', 'login'] },
+  webhook_url: '',
+  templates: [],
 };
 
 /**

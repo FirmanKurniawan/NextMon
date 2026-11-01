@@ -4,7 +4,7 @@ import { monitorApi } from './api.ts';
 
 export default defineFeature({
   id: 'monitor',
-  nav: [{ key: 'monitor', href: '/monitor', icon: 'activity', label: 'Monitor', group: 'Network', order: 10 }],
+  nav: [{ key: 'monitor', href: '/monitor', icon: 'activity', label: 'Monitor', group: 'Network', order: 50 }],
   pages: [{ path: '/monitor', title: 'Monitor', cap: 'view', page: 'monitor', scripts: ['/assets/next/net-forms.js'], component: () => import('./page.tsx') }],
   api: { monitor: monitorApi },
   i18n: {

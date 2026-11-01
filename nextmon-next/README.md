@@ -69,5 +69,5 @@ npm run cli -- doctor
 
 Halaman yang ada (setara edisi PHP): dasbor, user/profil/aktif/host/binding/walled garden, voucher (cetak, QR, template, impor CSV), POS, laporan, reseller + dompet, PPPoE/DHCP/ARP/queue/firewall, traffic live (SSE), monitor, tools, backup, penjadwal + endpoint cron, router + berbagi ro/rw, akun platform, wizard, onboarding, pengaturan/keamanan/audit/notifikasi/API key, toko publik + pembayaran + pesanan + halaman status.
 
-Teruji: typecheck, lint (0 error), 240 tes vitest, build produksi, 30+ halaman dimuat di build standalone mode demo. **Belum:** router MikroTik asli, gateway pembayaran live (hanya verifikasi webhook yang diuji), cetak kertas, Linux/macOS.
-Belum dipindahkan: penjualan reseller lewat alur toko, tombol "reset counters" massal (di PHP juga hanya backend), batas voucher/hari dan ukuran log, restore data aplikasi dari UI, beberapa tampilan (mode terang/375 px) hanya diperiksa sebagian.
+Teruji: typecheck, lint (0 error), 284 tes vitest, build produksi, 30+ halaman dimuat di build standalone mode demo. **Belum:** router MikroTik asli, gateway pembayaran live (hanya verifikasi webhook yang diuji), cetak kertas, Linux/macOS.
+Kini juga ada di kedua edisi: batas voucher/hari dan ukuran log, backup/restore data aplikasi dari UI (format di `docs/BACKUP-FORMAT.md`), dan penjualan reseller lewat tautan toko `?ref=`. Matriks kesetaraan PHP vs Next: `docs/PARITY.md`. Masih terbatas: tampilan mode terang/375 px hanya diperiksa sebagian; batas unggah restore 8 MB.

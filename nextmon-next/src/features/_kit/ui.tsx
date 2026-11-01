@@ -29,9 +29,7 @@ export function Empty({ icon, title, text, children }: { icon: string; title: st
   );
 }
 
-export function NoRouter({ t }: { t: TFn }) {
-  return <Empty icon="router" title={t('No router configured')} />;
-}
+export { default as NoRouter } from './NoRouter';
 
 export function Badge({ kind = 'neutral', children }: { kind?: string; children: ReactNode }) {
   return <span className={`badge badge-${kind}`}>{children}</span>;

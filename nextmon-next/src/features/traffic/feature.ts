@@ -3,7 +3,7 @@ import { defineFeature } from '../types.ts';
 
 export default defineFeature({
   id: 'traffic',
-  nav: [{ key: 'traffic', href: '/traffic', icon: 'activity', label: 'Traffic', group: 'Network', order: 15 }],
+  nav: [{ key: 'traffic', href: '/traffic', icon: 'activity', label: 'Traffic', group: 'Network', order: 55 }],
   pages: [{ path: '/traffic', title: 'Live traffic', cap: 'view', page: 'traffic', scripts: ['charts', '/assets/next/traffic.js'], component: () => import('./page.tsx') }],
   i18n: {
     id: {

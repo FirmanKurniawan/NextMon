@@ -45,7 +45,7 @@ function NavLinks({ nav, page, withTitles, t }: { nav: NavGroup[]; page: string;
  */
 export default function Shell({ ctx, page, title, scripts, nonce, back, children }: { ctx: AppContext; page: string; title: string; scripts: string[]; nonce: string; back: string; children: ReactNode }) {
   const t = ctx.t;
-  const nav = buildNav((c) => ctx.can(c));
+  const nav = buildNav((c) => ctx.can(c), ctx.user.role);
   const tabs = tabItems(nav);
   const groupName = groupOf(nav, page);
   const user = ctx.user;
@@ -107,7 +107,7 @@ export default function Shell({ ctx, page, title, scripts, nonce, back, children
               <span className="hide-m">{t('Search')}</span> <kbd className="hide-m">Ctrl K</kbd>
             </button>
             {ctx.can('platform') && workspaces.length > 0 ? (
-              <form action={switchWorkspaceAction} className="row" style={{ flexWrap: 'nowrap' }}>
+              <form action={switchWorkspaceAction} className="row hide-m" style={{ flexWrap: 'nowrap' }}>
                 <CsrfField ctx={ctx} />
                 <input type="hidden" name="back" value={back} />
                 <label className="sr-only" htmlFor="ws-sel">
@@ -146,6 +146,11 @@ export default function Shell({ ctx, page, title, scripts, nonce, back, children
                   <button className="btn btn-sm">{t('Go')}</button>
                 </noscript>
               </form>
+            ) : null}
+            {ctx.can('admin') ? (
+              <a className="btn btn-ghost btn-icon hide-m" href="/notifications" aria-label={t('Notifications')} data-tip={t('Notifications')}>
+                <Icon name="bell" />
+              </a>
             ) : null}
             <details className="menu">
               <summary className="btn btn-ghost btn-icon" aria-label={t('Account')}>
@@ -209,6 +214,14 @@ export default function Shell({ ctx, page, title, scripts, nonce, back, children
                   </div>
                 </div>
                 <hr />
+                <a className="item" href="/settings#account">
+                  <Icon name="user" size={16} />
+                  {t('My account')}
+                </a>
+                <a className="item" href="/status" target="_blank" rel="noopener">
+                  <Icon name="ticket" size={16} />
+                  {t('Voucher status page')}
+                </a>
                 <button className="item hide-m" type="button" data-help-open>
                   <Icon name="key" size={16} />
                   {t('Show shortcuts')}
@@ -227,10 +240,10 @@ export default function Shell({ ctx, page, title, scripts, nonce, back, children
 
           <main id="main" className="content" tabIndex={-1}>
             {ctx.impersonating ? (
-              <div className="alert warn" style={{ marginBottom: 'var(--s4)' }} role="status" data-impersonating>
-                <Icon name="building" size={18} />
+              <div className="alert warn impersonation-banner" style={{ marginBottom: 'var(--s4)' }} role="alert" data-impersonating>
+                <Icon name="alert" size={18} />
                 <div>
-                  {t('You are viewing workspace :name as platform admin. Your actions are recorded in the audit log.', { ':name': ctx.workspace.name })}
+                  {t('Platform mode: you are working inside workspace :w. Every action is recorded in its audit log.', { ':w': ctx.workspace.name })}
                   <form action={switchWorkspaceAction} style={{ display: 'inline', marginLeft: 8 }}>
                     <CsrfField ctx={ctx} />
                     <input type="hidden" name="workspace" value={ctx.user.workspace} />

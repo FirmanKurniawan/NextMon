@@ -13,6 +13,8 @@ import { Context } from '../../lib/context.ts';
 import { randomHex } from '../../lib/crypto.ts';
 import { money } from '../../lib/fmt.ts';
 import { Notify } from '../../lib/notify.ts';
+import { guard } from '../../lib/quota.ts';
+import { Reseller } from '../../lib/reseller.ts';
 import { Routers } from '../../lib/routers.ts';
 import { singleton } from '../../lib/singleton.ts';
 import { getSettings, Store } from '../../lib/store.ts';
@@ -55,6 +57,8 @@ export type Order = {
   refunded_at?: number;
   flag?: string;
   retry_at?: number;
+  /** reseller attribution from the shop referral link; commission is computed server-side at fulfilment */
+  attr?: { uid: string; code: string; at: number; credited_at?: number; comm?: number; pct?: number; reversed_at?: number; skipped?: string };
 };
 
 /** [ok, message, order] */
@@ -168,7 +172,7 @@ export const Orders = {
     return n;
   },
 
-  create(pkg: Package, customer: Order['customer'], gateway: string, expiryMin: number, routerId: string): Order {
+  create(pkg: Package, customer: Order['customer'], gateway: string, expiryMin: number, routerId: string, attr?: { uid: string; code: string } | null): Order {
     const ws = Workspace.id();
     for (let i = 0; i < 5; i++) {
       const d = new Date();
@@ -195,6 +199,7 @@ export const Orders = {
         events: [],
         ip: Context.current().ip ?? '',
       };
+      if (attr) o.attr = { uid: attr.uid, code: attr.code, at: now() };
       put(o);
       return o;
     }
@@ -248,7 +253,7 @@ export const Orders = {
       const o = Orders.get(id);
       if (!o || o.status !== 'paid' || o.voucher) return [true, 'nothing to do', o, false];
       o.retry_at = now();
-      const n = await provision(o);
+      const n = attribLocked(await provision(o));
       return [true, 'retried', n, !!n.voucher];
     });
     announce(res);
@@ -338,6 +343,7 @@ async function paidLocked(o: Order, source: string, amount: number | null): Prom
     o = await provision(o);
     fresh = !!o.voucher;
   }
+  o = attribLocked(o);
   return [true, o.voucher ? 'ok' : 'paid, voucher pending', o, fresh];
 }
 
@@ -358,7 +364,8 @@ async function provision(o: Order): Promise<Order> {
       const pre: NonNullable<Order['voucher_pre']> = o.voucher_pre!;
       const ex = await r.print('/ip/hotspot/user', { name: pre.user });
       if (!ex.length) {
-        await r.add('/ip/hotspot/user', { name: pre.user, password: pre.pass, profile: o.package.profile, comment: pre.comment });
+        // daily voucher limit: a refused fulfilment is recorded as fulfil_err and can be retried (order stays paid)
+        await guard(1, () => r.add('/ip/hotspot/user', { name: pre.user, password: pre.pass, profile: o.package.profile, comment: pre.comment }));
         break;
       }
       if (String(ex[0]!.comment ?? '').includes(o.id)) break; // our own user from an interrupted attempt
@@ -381,6 +388,30 @@ async function provision(o: Order): Promise<Order> {
   return o;
 }
 
+/**
+ * MUST run under the order lock. Reseller commission for an attributed order: only when PAID and fulfilled, computed on the server from
+ * the order total with the reseller's commission %, credited once (order flag + ledger guard), saved.
+ */
+function attribLocked(o: Order): Order {
+  const a = o.attr;
+  if (!a || o.status !== 'paid' || !o.voucher || a.credited_at || a.skipped) return o;
+  const cfg = Reseller.cfg(a.uid);
+  if (!cfg || !cfg.active) {
+    a.skipped = 'inactive';
+    event(o, 'commission_skipped', 'reseller inactive');
+    put(o);
+    return o;
+  }
+  const amt = Reseller.commissionFor(cfg, Number(o.amount), 1);
+  const r = Reseller.creditOrder(a.uid, o.id, amt, String(Number(cfg.commission)));
+  a.credited_at = now();
+  a.comm = r.already ? amt : r.credited;
+  a.pct = Number(cfg.commission);
+  event(o, 'commission', (r.already ? 'already credited ' : 'credited ') + a.comm);
+  put(o);
+  return o;
+}
+
 function announce(res: Inner): void {
   const o = res[2];
   if (!res[3] || !o) return;
@@ -394,6 +425,11 @@ async function refundLocked(o: Order, by: string, note: string, disable: boolean
   Orders.note(o, by, 'REFUND: ' + note);
   event(o, 'refunded', by);
   let msg = 'refunded';
+  if (o.attr?.credited_at && !o.attr.reversed_at) {
+    Reseller.reverseOrder(o.attr.uid, o.id, Number(o.attr.comm ?? 0));
+    o.attr.reversed_at = now();
+    event(o, 'commission_reversed', String(o.attr.comm ?? 0));
+  }
   if (disable && o.voucher) {
     try {
       const rv = Shop.routerOf(Shop.config(), o.router);

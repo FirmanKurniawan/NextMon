@@ -1,5 +1,6 @@
 /** Voucher (hotspot user batch) generation. Port of nextmon-php Voucher.php. */
 import crypto from 'node:crypto';
+import { release, reserve } from './quota.ts';
 import { getSettings } from './store.ts';
 import type { Driver } from './driver.ts';
 
@@ -51,6 +52,16 @@ export async function generate(r: Driver, o: GenOptions, now = new Date()): Prom
   const batch = (o.batch ?? '').replace(/[^A-Za-z0-9_. -]/g, '').trim().slice(0, 24);
   const comment = `${mode}-${crypto.randomInt(100, 1000)}-${pad(now.getMonth() + 1)}.${pad(now.getDate())}.${pad(now.getFullYear() % 100)}${batch ? '-' + batch : ''}`;
 
+  const tok = reserve(qty); // daily voucher limit: refuses the whole batch (QuotaError) before anything is created
+  try {
+    return await build(r, o, qty, len, prefix, set, mode, comment, tok);
+  } catch (e) {
+    release(tok); // generation failed: give the reserved units back
+    throw e;
+  }
+}
+
+async function build(r: Driver, o: GenOptions, qty: number, len: number, prefix: string, set: string, mode: string, comment: string, tok: ReturnType<typeof reserve>): Promise<{ comment: string; items: [string, string][] }> {
   const existing = new Set((await r.print('/ip/hotspot/user', {}, ['name'])).map((x) => x.name ?? ''));
   const items: [string, string][] = [];
   const rows: Record<string, string>[] = [];
@@ -68,6 +79,7 @@ export async function generate(r: Driver, o: GenOptions, now = new Date()): Prom
     items.push([name, pass]);
   }
   await r.addMany('/ip/hotspot/user', rows); // pipelined: many vouchers per round-trip
+  release(tok, qty - items.length); // fewer codes than asked (collision guard)
   return { comment, items };
 }
 

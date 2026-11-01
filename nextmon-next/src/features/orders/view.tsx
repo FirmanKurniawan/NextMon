@@ -2,6 +2,7 @@ import { Icon } from '../../components/Icon';
 import { money } from '../../lib/fmt.ts';
 import { zonedParts } from '../../lib/sales.ts';
 import { getSettings } from '../../lib/store.ts';
+import { Users } from '../../lib/users.ts';
 import ActionForm from '../_sales/ActionForm';
 import Flash from '../_sales/Flash.tsx';
 import { Badge, PageHead } from '../_sales/ui';
@@ -105,6 +106,24 @@ export default async function OrderViewPage({ ctx, searchParams }: PageProps) {
               <dd className="mono">{o.ref || '-'}</dd>
               <dt>IP</dt>
               <dd className="mono">{o.ip}</dd>
+              {o.attr ? (
+                <>
+                  <dt>{t('Reseller')}</dt>
+                  <dd>
+                    <a href={'/resellers/ledger?uid=' + encodeURIComponent(o.attr.uid)}>{Users.inWorkspace(ctx.workspace.id).find((u) => u.id === o.attr!.uid)?.username ?? o.attr.uid}</a> <span className="muted mono">(ref {o.attr.code})</span>
+                  </dd>
+                  <dt>{t('Commission')}</dt>
+                  <dd className="mono">
+                    {o.attr.reversed_at
+                      ? `${m(o.attr.comm ?? 0)} · ${t('Reversed')}`
+                      : o.attr.credited_at
+                        ? `${m(o.attr.comm ?? 0)} · ${t('Credited')}`
+                        : o.attr.skipped
+                          ? t('Skipped (reseller inactive)')
+                          : t('Pending (paid and fulfilled)')}
+                  </dd>
+                </>
+              ) : null}
             </dl>
           </div>
         </section>

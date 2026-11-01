@@ -1,3 +1,4 @@
+import { guard, QuotaError } from '../../lib/quota.ts';
 import { audit } from '../_kit/audit.ts';
 import { arr, backTo, raw, str, UserError } from '../_kit/forms.ts';
 import type { FormRoute } from '../_kit/forms.ts';
@@ -38,7 +39,12 @@ export const userForms: Record<string, FormRoute> = {
         audit('user.edit', name);
       } else {
         for (const k of Object.keys(attrs)) if (attrs[k] === '') delete attrs[k];
-        await r.add('/ip/hotspot/user', attrs);
+        try {
+          await guard(1, () => r.add('/ip/hotspot/user', attrs)); // counts toward the daily voucher limit
+        } catch (e) {
+          if (e instanceof QuotaError) throw new UserError(t(e.key, e.params));
+          throw e;
+        }
         audit('user.add', name);
       }
       return { to: backTo(fd, BACK), msg: t('User saved.') };

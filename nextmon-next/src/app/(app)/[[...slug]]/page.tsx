@@ -1,5 +1,4 @@
-import { notFound } from 'next/navigation';
-import { Icon } from '../../../components/Icon';
+import { forbidden, notFound } from 'next/navigation';
 import { Features } from '../../../features/registry.ts';
 import Onboarding from '../../../features/routers/Onboarding';
 import { requireContext } from '../../../server/guard.ts';
@@ -15,15 +14,7 @@ export default async function FeaturePageRoute({ params, searchParams }: { param
   const { slug = [] } = await params;
   const m = Features.matchPage('/' + slug.map((s) => decodeURIComponent(s)).join('/'));
   if (!m) notFound();
-  if (!ctx.can(m.page.cap ?? 'view')) {
-    return (
-      <div className="empty">
-        <Icon name="shield" size={32} />
-        <h3>{ctx.t('Forbidden')}</h3>
-        <p>{ctx.t('Your role cannot access this page.')}</p>
-      </div>
-    );
-  }
+  if (!ctx.can(m.page.cap ?? 'view')) forbidden(); // HTTP 403 (app/(app)/forbidden.tsx), like the PHP edition
   // first-run state: an account without any router gets "Add router" / "Try demo mode" instead of an empty dashboard
   if (!ctx.router && m.page.path === '/') return <Onboarding ctx={ctx} addHref="/routers" />;
   const mod = await m.page.component();

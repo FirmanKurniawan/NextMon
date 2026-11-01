@@ -5,7 +5,7 @@ import { ago, fmtBytes } from '../../lib/fmt.ts';
 import { Net } from '../../lib/net.ts';
 import { Routers } from '../../lib/routers.ts';
 import { getSettings } from '../../lib/store.ts';
-import { Badge, Empty, NetAssets, PageHead } from '../_netkit/ui';
+import { Badge, Empty, NetAssets, NoRouter, PageHead } from '../_netkit/ui';
 import { sp } from '../_netkit/util.ts';
 import { schedState } from '../scheduler/run.ts';
 import type { PageProps } from '../types.ts';
@@ -33,7 +33,7 @@ export default async function MonitorPage({ ctx, searchParams }: PageProps) {
       <>
         <NetAssets />
         <PageHead title={t('Monitor')} desc={t('Router status, latency history, alerts and scheduled backups.')} />
-        <Empty icon="router" title={t('No router configured')} />
+        <NoRouter t={t} />
       </>
     );
   let rid = sp(searchParams.router) || ctx.router?.id || '';

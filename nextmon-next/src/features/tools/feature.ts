@@ -4,7 +4,7 @@ import { toolsApi } from './api.ts';
 
 export default defineFeature({
   id: 'tools',
-  nav: [{ key: 'tools', href: '/tools', icon: 'terminal', label: 'Tools', group: 'Network', order: 70 }],
+  nav: [{ key: 'tools', href: '/tools', icon: 'terminal', label: 'Tools', group: 'Network', order: 30 }],
   pages: [{ path: '/tools', title: 'Tools', cap: 'view', page: 'tools', scripts: ['pages'], component: () => import('./page.tsx') }],
   api: { tools: toolsApi },
 });

@@ -5,6 +5,7 @@
  */
 import type { Driver } from '../../lib/driver.ts';
 import { Notify } from '../../lib/notify.ts';
+import { QuotaError } from '../../lib/quota.ts';
 import { basePrice, charge, isBlocked, recordBatch, rollback } from '../../lib/reseller.ts';
 import type { Ticket } from '../../lib/reseller.ts';
 import { parseMeta } from '../../lib/scripts.ts';
@@ -74,6 +75,7 @@ export async function generateBatch(ctx: AppContext, fd: FormData): Promise<{ to
     });
   } catch (e) {
     if (ticket) rollback(ticket, 'voucher error');
+    if (e instanceof QuotaError) throw new UserError(t(e.key, e.params), BACK); // daily voucher limit: nothing created, wallet refunded
     throw e;
   }
   const n = res.items.length;

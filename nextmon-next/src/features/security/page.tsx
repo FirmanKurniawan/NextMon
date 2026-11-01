@@ -8,6 +8,9 @@ import { agoStr, Badge, Csrf, PageHead, stamp } from '../settings/ui.tsx';
 import { revokeOthersAction, revokeSessionAction, savePolicyAction } from './actions.ts';
 import { visibleSessions } from './data.ts';
 
+// eslint-disable-next-line @next/next/no-css-tags
+const CSS = <link rel="stylesheet" href="/assets/css/mod-security.css" precedence="default" />;
+
 /** Settings > Security: signed-in sessions, login history, password policy (owners). Port of views/security.php. */
 export default function SecurityPage({ ctx }: PageProps) {
   const t = ctx.t;
@@ -23,6 +26,7 @@ export default function SecurityPage({ ctx }: PageProps) {
 
   return (
     <>
+      {CSS}
       <PageHead
         title={t('Security')}
         desc={t('Password policy, session timeout, signed-in devices and sign-in history.')}

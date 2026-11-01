@@ -91,7 +91,7 @@ final class Orders
         }
     }
 
-    public static function create(array $pkg, array $customer, string $gateway, int $expiryMin, string $routerId): array
+    public static function create(array $pkg, array $customer, string $gateway, int $expiryMin, string $routerId, ?array $attr = null): array
     {
         for ($i = 0; $i < 5; $i++) {
             $ws = Workspace::id();
@@ -121,6 +121,9 @@ final class Orders
                 'events' => [],
                 'ip' => Audit::ip(),
             ];
+            if ($attr) {
+                $o['attr'] = ['uid' => (string)$attr['uid'], 'code' => (string)$attr['code'], 'at' => time()];   // attribution only; commission is computed at fulfilment
+            }
             self::put($o);
             return $o;
         }
@@ -194,7 +197,7 @@ final class Orders
                 return [true, 'nothing to do', $o, false];
             }
             $o['retry_at'] = time();
-            $o = self::provision($o);
+            $o = self::attribLocked(self::provision($o));
             return [true, 'retried', $o, !empty($o['voucher'])];
         });
         self::announce($res);
@@ -278,6 +281,7 @@ final class Orders
             $o = self::provision($o);
             $fresh = !empty($o['voucher']);
         }
+        $o = self::attribLocked($o);
         return [true, empty($o['voucher']) ? 'paid, voucher pending' : 'ok', $o, $fresh];
     }
 
@@ -300,7 +304,8 @@ final class Orders
                 $pre = $o['voucher_pre'];
                 $ex = $r->print('/ip/hotspot/user', ['name' => $pre['user']]);
                 if (!$ex) {
-                    $r->add('/ip/hotspot/user', ['name' => $pre['user'], 'password' => $pre['pass'], 'profile' => $o['package']['profile'], 'comment' => $pre['comment']]);
+                    // daily voucher limit: a refused fulfilment is recorded as fulfil_err and can be retried (order stays paid)
+                    Quota::guard(1, fn() => $r->add('/ip/hotspot/user', ['name' => $pre['user'], 'password' => $pre['pass'], 'profile' => $o['package']['profile'], 'comment' => $pre['comment']]));
                     CachedDriver::flush((string)$rc['id']);   // the admin UI reads this router through the short read cache
                     break;
                 }
@@ -324,6 +329,34 @@ final class Orders
             $o['fulfil_err'] = mb_substr($e->getMessage(), 0, 200);
             self::event($o, 'fulfil_error', $o['fulfil_err']);
         }
+        self::put($o);
+        return $o;
+    }
+
+    /**
+     * MUST run under the order lock. Reseller commission for an attributed order: only when PAID and fulfilled, computed on the server
+     * from the order total with the reseller's commission %, credited once (order flag + ledger guard), saved.
+     */
+    private static function attribLocked(array $o): array
+    {
+        $a = $o['attr'] ?? null;
+        if (!$a || $o['status'] !== 'paid' || empty($o['voucher']) || !empty($a['credited_at']) || !empty($a['skipped'])) {
+            return $o;
+        }
+        $cfg = Reseller::cfg((string)$a['uid']);
+        if (!$cfg || !$cfg['active']) {
+            $o['attr']['skipped'] = 'inactive';
+            self::event($o, 'commission_skipped', 'reseller inactive');
+            self::put($o);
+            return $o;
+        }
+        $amt = Reseller::commissionFor($cfg, (float)$o['amount'], 1);
+        $already = false;
+        $done = Reseller::creditOrder((string)$a['uid'], $o['id'], $amt, rtrim(rtrim(number_format((float)$cfg['commission'], 2, '.', ''), '0'), '.'), $already);
+        $o['attr']['credited_at'] = time();
+        $o['attr']['comm'] = $already ? $amt : $done;
+        $o['attr']['pct'] = (float)$cfg['commission'];
+        self::event($o, 'commission', ($already ? 'already credited ' : 'credited ') . $o['attr']['comm']);
         self::put($o);
         return $o;
     }
@@ -359,6 +392,11 @@ final class Orders
         self::note($o, $by, 'REFUND: ' . $note);
         self::event($o, 'refunded', $by);
         $msg = 'refunded';
+        if (!empty($o['attr']['credited_at']) && empty($o['attr']['reversed_at'])) {
+            Reseller::reverseOrder((string)$o['attr']['uid'], $o['id'], (int)($o['attr']['comm'] ?? 0));
+            $o['attr']['reversed_at'] = time();
+            self::event($o, 'commission_reversed', (string)($o['attr']['comm'] ?? 0));
+        }
         if ($disable && !empty($o['voucher'])) {
             try {
                 $rc = App::routerCfg($o['router']) ?: Shop::routerCfg(Shop::config());

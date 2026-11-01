@@ -23,12 +23,13 @@ export async function generateMetadata({ searchParams }: { searchParams: SP }): 
 /** Public storefront: GET /shop[?w=slug]. The workspace comes ONLY from the slug (default `main`). */
 export default async function ShopPage({ searchParams }: { searchParams: SP }) {
   const info = await reqInfo();
-  const r = resolveSlug(first((await searchParams).w));
+  const sp = await searchParams;
+  const r = resolveSlug(first(sp.w));
   if (!('ws' in r)) {
     if (r.why === 'suspended') return <NeutralNotFound t={translatorFor(info)} nonce={info.nonce} suspended />;
     notFound();
   }
-  const v = inWorkspace(r.ws, info.ip, () => storeView());
+  const v = inWorkspace(r.ws, info.ip, () => storeView(first(sp.ref)));
   const t = translatorFor(info, v.lang);
   const c = v.c;
   const homeHref = '/shop' + v.wq;
@@ -46,6 +47,7 @@ export default async function ShopPage({ searchParams }: { searchParams: SP }) {
             action={placeOrder}
             csrf={Csrf.pre('shop')}
             slug={v.slug}
+            refCode={v.ref}
             packs={v.packages.map((p) => ({ id: p.id, label: p.label !== '' ? p.label : p.profile, badge: p.badge, desc: p.desc, price: money(p.price, v.currency) }))}
             labels={{
               package: t('Package'),

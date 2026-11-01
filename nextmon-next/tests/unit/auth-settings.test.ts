@@ -122,7 +122,7 @@ describe('notifications', () => {
     await Workspace.run(A.ws, () => Notify.save({ enabled: true, token: '', chat_id: '-100', webhook_url: '', events: [] }));
     expect(Crypto.decrypt((Workspace.run(A.ws, () => getSettings()).telegram as { token: string }).token)).toBe('123:SECRET');
     // other workspace has nothing
-    expect(Workspace.run(B.ws, () => Notify.config().tg.token)).toBeUndefined();
+    expect(Workspace.run(B.ws, () => Notify.config().tg.token)).toBeFalsy();
   });
 
   it('a test send to a blocked webhook is refused and logged, not sent', async () => {

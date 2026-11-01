@@ -57,6 +57,10 @@ export type NavItem = {
   order?: number;
   /** Show in the mobile bottom tab bar (lower number = further left, max 4 shown). */
   tab?: number;
+  /** Tab bar only: show this item in the tab bar only when the nav item with this key is NOT visible to the user (e.g. Active sessions instead of Vouchers for read-only roles). */
+  tabFallback?: string;
+  /** Show only to these roles (in addition to `cap`), e.g. "My wallet" for reseller accounts only. */
+  roles?: readonly string[];
 };
 
 export type Feature = {

@@ -3,6 +3,7 @@
  * suspend / reactivate, limits, owner password reset, delete, and entering a workspace. Capability `platform` is enforced by the
  * action / page guards; every write is recorded in the global platform audit log. Call inside ctx.run().
  */
+import { logUsage, usage as voucherUsage } from '../../lib/quota.ts';
 import { ApiKeys } from '../../lib/apikeys.ts';
 import { Audit } from '../../lib/audit.ts';
 import { Context } from '../../lib/context.ts';
@@ -54,7 +55,7 @@ export function ownerOf(ws: string): User | null {
   );
 }
 
-export type AccountRow = WorkspaceRec & { owner_name: string; user_count: number; router_count: number; eff: Limits };
+export type AccountRow = WorkspaceRec & { owner_name: string; user_count: number; router_count: number; eff: Limits; vq: { used: number; limit: number }; lq: { used: number; limit: number } };
 
 export function accountRows(): AccountRow[] {
   return Workspace.all().map((w) => ({
@@ -63,6 +64,8 @@ export function accountRows(): AccountRow[] {
     user_count: Users.inWorkspace(w.id).length,
     router_count: Workspace.run(w.id, () => Store.read<unknown[]>('routers', []).length),
     eff: Workspace.limits(w.id),
+    vq: voucherUsage(w.id),
+    lq: logUsage(w.id),
   }));
 }
 

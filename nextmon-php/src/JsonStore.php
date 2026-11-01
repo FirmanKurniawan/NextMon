@@ -129,14 +129,41 @@ final class JsonStore
         return $this->dir . '/' . $this->safe($file);
     }
 
-    public function append(string $file, array $row): void
+    /**
+     * Append one row. $cap > 0 keeps the collection near that many rows: a sidecar "<file>.cnt" holds the line count (counted once
+     * if missing) and only when it passes cap + 10% is the file rewritten down to the newest $cap rows (O(cap) once per ~cap/10
+     * appends). Without a cap the old size-based rotation applies.
+     */
+    public function append(string $file, array $row, int $cap = 0): void
     {
         $f = $this->lf($file);
         $this->ensureParent($f);
-        if (is_file($f) && filesize($f) > 2 * 1024 * 1024) {
+        if ($cap <= 0 && is_file($f) && filesize($f) > 2 * 1024 * 1024) {
             @rename($f, $f . '.1');
         }
-        @file_put_contents($f, json_encode($row, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n", FILE_APPEND | LOCK_EX);
+        $line = json_encode($row, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
+        $h = $cap > 0 ? @fopen($f . '.cnt', 'c+') : false;
+        if (!$h) {
+            @file_put_contents($f, $line, FILE_APPEND | LOCK_EX);
+            return;
+        }
+        flock($h, LOCK_EX);
+        try {
+            $raw = trim((string)stream_get_contents($h));
+            $n = $raw !== '' && ctype_digit($raw) ? (int)$raw : count($this->all($file));
+            @file_put_contents($f, $line, FILE_APPEND | LOCK_EX);
+            $n++;
+            if ($n > $cap + max(1, intdiv($cap, 10))) {
+                $this->prune($file, $cap);
+                $n = $cap;
+            }
+            ftruncate($h, 0);
+            rewind($h);
+            fwrite($h, (string)$n);
+        } finally {
+            flock($h, LOCK_UN);
+            fclose($h);
+        }
     }
 
     private function all(string $file): array
@@ -199,17 +226,17 @@ final class JsonStore
     {
         $all = $this->all($file);
         $drop = count($all) - max(0, $keep);
+        $f = $this->lf($file);
         if ($drop <= 0) {
             return 0;
         }
-        $f = $this->lf($file);
         $lines = '';
         foreach (array_slice($all, $drop) as $r) {
             $lines .= json_encode($r, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
         }
         file_put_contents($f, $lines, LOCK_EX);
         @unlink($f . '.1');
-        return $drop;
+        return $drop;   // a stale (too high) .cnt sidecar only makes the next capped append re-trim once
     }
 
     // ---- multi-tenant migration support (TenantMigration) --------------------------------------------

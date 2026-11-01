@@ -23,10 +23,10 @@ export const ordersApi: ApiRoute = {
       const p = zonedParts(ts, tz);
       return `${p.y}-${p2(p.mo)}-${p2(p.d)} ${p2(p.h)}:${p2(p.mi)}:${p2(p.s)}`;
     };
-    const lines = [['order', 'created', 'paid_at', 'status', 'package', 'profile', 'amount', 'name', 'phone', 'email', 'gateway', 'gateway_ref', 'voucher', 'fulfil', 'flag'].join(',')];
+    const lines = [['order', 'created', 'paid_at', 'status', 'package', 'profile', 'amount', 'name', 'phone', 'email', 'gateway', 'gateway_ref', 'voucher', 'fulfil', 'flag', 'reseller_ref', 'commission'].join(',')];
     for (const o of rows) {
       lines.push(
-        [o.id, when(o.created), o.paid_at ? when(o.paid_at) : '', o.status, o.package.label, o.package.profile, o.amount, o.customer.name ?? '', o.customer.phone ?? '', o.customer.email ?? '', o.gateway, o.ref, o.voucher?.user ?? '', o.fulfil ?? '', o.flag ?? '']
+        [o.id, when(o.created), o.paid_at ? when(o.paid_at) : '', o.status, o.package.label, o.package.profile, o.amount, o.customer.name ?? '', o.customer.phone ?? '', o.customer.email ?? '', o.gateway, o.ref, o.voucher?.user ?? '', o.fulfil ?? '', o.flag ?? '', o.attr?.code ?? '', o.attr?.credited_at && !o.attr.reversed_at ? (o.attr.comm ?? 0) : '']
           .map((v) => field(csvCell(v)))
           .join(','),
       );

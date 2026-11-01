@@ -1,0 +1,21 @@
+{
+    "format": "nextmon-backup",
+    "version": 1,
+    "edition": "php",
+    "created": "2026-11-01T13:45:53+00:00",
+    "includes_secrets": false,
+    "counts": {
+        "routers": 2,
+        "settings": 3,
+        "shop": 1,
+        "resellers": 1,
+        "wallets": 1,
+        "wallet_ledger": 2,
+        "orders": 1
+    },
+    "checksum": {
+        "algo": "sha256",
+        "value": "fceb3af62c8cd31aeed3ba9eb80edc3a6e7deb699e294fe112742b6a0c7a6efc"
+    },
+    "payload": "{\"docs\":{\"routers\":[{\"id\":\"22222222\",\"name\":\"PHP Router\",\"session\":\"php\",\"type\":\"real\",\"host\":\"10.2.2.2\",\"port\":8728,\"ssl\":false,\"verify_tls\":false,\"user\":\"api\",\"pass\":\"\",\"hotspot_name\":\"PHP WiFi\"},{\"id\":\"demo\",\"name\":\"Demo\",\"session\":\"demo\",\"type\":\"demo\",\"host\":\"\",\"port\":8728,\"ssl\":false,\"user\":\"\",\"pass\":\"\",\"hotspot_name\":\"\"}],\"settings\":{\"hotspot_name\":\"PHP Fixture\",\"currency\":\"Rp\",\"templates\":[{\"id\":\"t1\",\"name\":\"Card\",\"html\":\"<div>{{user}}</div>\",\"w\":70.0,\"h\":40.0}]},\"shop\":{\"enabled\":true},\"resellers\":{\"u-1\":{\"commission\":10}},\"wallets\":{\"u-1\":12500}},\"logs\":{\"wallet_ledger\":[{\"id\":\"PL1\",\"ts\":100,\"uid\":\"u-1\",\"type\":\"topup\",\"amount\":20000,\"bal\":20000},{\"id\":\"PL2\",\"ts\":200,\"uid\":\"u-1\",\"type\":\"sale\",\"amount\":-7500,\"bal\":12500}]},\"orders\":[{\"id\":\"KL250101-ABCDEF\",\"token\":\"phptoken1234567\",\"created\":1700000000,\"updated\":1793540753,\"expires\":1700003600,\"status\":\"paid\",\"package\":{\"id\":\"p1\",\"profile\":\"1h\",\"price\":5000,\"label\":\"1 hour\"},\"amount\":5000,\"customer\":{\"name\":\"PHP Customer\"},\"gateway\":\"mock\",\"router\":\"22222222\",\"ref\":\"\",\"pay_url\":\"\",\"pay_info\":\"\",\"voucher\":null,\"fulfil\":\"\",\"notes\":[],\"events\":[],\"ip\":\"1.2.3.4\"}]}"
+}

@@ -1,0 +1,8 @@
+"copied" <- components/shellStrings.ts
+"Choose a backup file first." <- features/backup/api.ts
+"File checked. Review what will be replaced below." <- features/backup/api.ts
+"Restore cancelled. Nothing was changed." <- features/backup/api.ts
+"The restore preview expired. Upload the file again." <- features/backup/api.ts
+"Type RESTORE to confirm." <- features/backup/api.ts
+"Restore complete: :c. Previous data saved as :f" <- features/backup/api.ts
+"Deleted :n users" <- lib/i18n.ts

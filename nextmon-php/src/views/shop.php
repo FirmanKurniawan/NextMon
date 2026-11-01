@@ -18,6 +18,7 @@ if ($sel === '' && count($packages) === 1) {
     <?php } else { ?>
     <form method="post" action="<?= e(url('/shop/order') . Shop::wQuery()) ?>" class="shp-form" id="shop-form" autocomplete="on">
       <?= csrf_field() ?>
+      <?php if (!empty($ref)) { ?><input type="hidden" name="ref" value="<?= e($ref) ?>"><?php } ?>
       <div class="shp-hp" aria-hidden="true"><label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
 
       <fieldset class="shp-packs">

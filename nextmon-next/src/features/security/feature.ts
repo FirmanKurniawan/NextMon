@@ -2,7 +2,7 @@ import { defineFeature } from '../types.ts';
 
 export default defineFeature({
   id: 'security',
-  // reached from Settings; no sidebar entry of its own (the PHP edition links it from the Settings page head)
+  nav: [{ key: 'security', href: '/settings/security', icon: 'shield', label: 'Security', group: 'System', order: 60 }],
   pages: [{ path: '/settings/security', title: 'Security', cap: 'view', page: 'security', scripts: ['pages'], component: () => import('./page.tsx') }],
   i18n: {
     id: {

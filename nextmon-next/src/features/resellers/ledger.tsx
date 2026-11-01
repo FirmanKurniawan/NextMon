@@ -8,7 +8,7 @@ import Flash from '../_sales/Flash.tsx';
 import { Badge, Empty, PageHead, Pager, paginate, qs } from '../_sales/ui';
 import type { PageProps } from '../types.ts';
 import { refundEntry } from './actions.ts';
-import { Assets, ledgerFilters, num, signed, TypeBadge, ucfirst } from './ui.tsx';
+import { Assets, ledgerFilters, num, orderOf, signed, TypeBadge, ucfirst } from './ui.tsx';
 
 /** /resellers/ledger: append-only record of every balance movement (filters, paging, refund of a sale row). */
 export default async function LedgerPage({ ctx, searchParams }: PageProps) {
@@ -107,6 +107,14 @@ export default async function LedgerPage({ ctx, searchParams }: PageProps) {
                       </td>
                       <td data-label={t('Note')} className="wrap">
                         {r.note}
+                        {orderOf(r) ? (
+                          <>
+                            {' '}
+                            <a className="mono" href={'/orders/view?id=' + encodeURIComponent(orderOf(r))}>
+                              {orderOf(r)}
+                            </a>
+                          </>
+                        ) : null}
                         {refunded.has(r.id) ? (
                           <>
                             {' '}

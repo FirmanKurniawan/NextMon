@@ -4,7 +4,8 @@ import { Reseller } from '../../lib/reseller.ts';
 import { currencyOf, profilePrices } from '../_sales/common.ts';
 import { Empty, PageHead, Pager, paginate, qs } from '../_sales/ui';
 import type { PageProps } from '../types.ts';
-import { Assets, ledgerFilters, num, signed, TypeBadge, ucfirst } from './ui.tsx';
+import { Shop } from '../shop/config.ts';
+import { Assets, ledgerFilters, num, orderOf, signed, TypeBadge, ucfirst } from './ui.tsx';
 
 /** /me/wallet: the reseller's own balance, price list and transactions. The uid filter is forced from the session. */
 export default async function WalletPage({ ctx, searchParams }: PageProps) {
@@ -51,6 +52,15 @@ export default async function WalletPage({ ctx, searchParams }: PageProps) {
         <div className="alert err" style={{ marginBottom: 'var(--s4)' }}>
           <Icon name="alert" size={18} />
           <div>{t('Your reseller account is disabled.')}</div>
+        </div>
+      ) : null}
+
+      {cfg?.ref ? (
+        <div className="alert info" style={{ marginBottom: 'var(--s4)' }}>
+          <Icon name="cart" size={18} />
+          <div>
+            {t('Your shop link (earn commission on paid shop orders):')} <span className="mono">{'/shop' + Shop.wQuery() + (Shop.wQuery() === '' ? '?' : '&') + 'ref=' + cfg.ref}</span>
+          </div>
         </div>
       ) : null}
 
@@ -183,6 +193,14 @@ export default async function WalletPage({ ctx, searchParams }: PageProps) {
                       </td>
                       <td data-label={t('Note')} className="wrap">
                         {r.note}
+                        {orderOf(r) ? (
+                          <>
+                            {' '}
+                            <a className="mono" href={'/orders/view?id=' + encodeURIComponent(orderOf(r))}>
+                              {orderOf(r)}
+                            </a>
+                          </>
+                        ) : null}
                       </td>
                       <td data-label={t('Amount')} className={'num mono ' + (r.amount < 0 ? 'rs-neg' : 'rs-pos')}>
                         {signed(r.amount)}

@@ -19,8 +19,9 @@ export default async function BareLayout({ children }: { children: ReactNode }) 
     <html lang={lang} data-theme="auto" suppressHydrationWarning>
       <head>
         {/* blocking on purpose: applies theme/accent/density before first paint (no flash) */}
+        {/* browsers hide the nonce attribute from the DOM (the client sees ""), so React would flag a hydration mismatch */}
         {/* eslint-disable-next-line @next/next/no-sync-scripts */}
-        <script src="/assets/js/theme.js" nonce={nonce} />
+        <script src="/assets/js/theme.js" nonce={nonce} suppressHydrationWarning />
       </head>
       <body data-base="">
         <div className="bg" aria-hidden="true" />

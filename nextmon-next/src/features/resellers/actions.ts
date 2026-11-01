@@ -43,6 +43,17 @@ export async function saveReseller(fd: FormData): Promise<To> {
   });
 }
 
+/** POST /resellers/ref: set / clear the shop referral code of a reseller (unique per workspace). admin. */
+export async function saveRef(fd: FormData): Promise<To> {
+  return runAction({ cap: 'admin' }, fd, async (ctx) => {
+    const u = resellerUser(ctx, String(fd.get('id') ?? ''));
+    if (!u) return { to: withFlash('/resellers', ctx.csrf, 'err', ctx.t('User not found.')) };
+    const err = Reseller.setRef(u.id, String(fd.get('ref') ?? ''));
+    audit(ctx, 'reseller.ref', u.username + (err === '' ? '' : ' failed'));
+    return { to: withFlash('/resellers', ctx.csrf, err === '' ? 'ok' : 'err', err === '' ? ctx.t('Referral code saved.') : err) };
+  });
+}
+
 /** POST /resellers/fund: top-up (positive) or signed adjustment (note required). admin. */
 export async function fundReseller(fd: FormData): Promise<To> {
   return runAction({ cap: 'admin' }, fd, async (ctx) => {

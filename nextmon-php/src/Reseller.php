@@ -44,9 +44,92 @@ final class Reseller
             'profiles' => $profiles,
         ];
         Store::update('resellers', function ($a) use ($uid, $cfg) {
+            $cfg['ref'] = (string)($a[$uid]['ref'] ?? '');   // the referral code is managed by setRef() only
             $a[$uid] = $cfg;
             return $a;
         }, []);
+    }
+
+    // ---- shop referral: ?ref=<code> only ATTRIBUTES an order to a reseller (never workspace / price / product) ------------
+
+    public const REF_RE = '/^[a-z0-9][a-z0-9-]{2,23}$/';
+
+    /** Slug-safe form of a client-supplied code ('' when nothing usable is left). */
+    public static function cleanRef(string $s): string
+    {
+        $s = trim(preg_replace('/[^a-z0-9-]+/', '-', strtolower(mb_substr($s, 0, 60))), '-');
+        return preg_match(self::REF_RE, $s) ? $s : '';
+    }
+
+    /** Set (or clear with '') the referral code of a reseller. Unique per workspace. Returns '' on success, else an error message. */
+    public static function setRef(string $uid, string $code): string
+    {
+        $code = trim(strtolower($code));
+        if ($code !== '' && self::cleanRef($code) !== $code) {
+            return t('Referral code: 3-24 characters, a-z, 0-9 and dash.');
+        }
+        $err = '';
+        Store::update('resellers', function ($a) use ($uid, $code, &$err) {
+            foreach ($a as $id => $c) {
+                if ($code !== '' && $id !== $uid && ($c['ref'] ?? '') === $code) {
+                    $err = t('This referral code is already used.');
+                    return $a;
+                }
+            }
+            $a[$uid] = array_replace(self::defaults(), (array)($a[$uid] ?? []), ['ref' => $code]);
+            return $a;
+        }, []);
+        return $err;
+    }
+
+    /** Active reseller owning referral $code in the CURRENT workspace, or null (unknown / inactive / not a reseller user: ignored silently). */
+    public static function byRef(string $code): ?array
+    {
+        $code = self::cleanRef($code);
+        if ($code === '') {
+            return null;
+        }
+        foreach (self::all() as $uid => $c) {
+            if (($c['ref'] ?? '') !== $code) {
+                continue;
+            }
+            $cfg = array_replace(self::defaults(), (array)$c);
+            if (!$cfg['active']) {
+                return null;
+            }
+            foreach (Auth::users() as $u) {
+                if ($u['id'] === $uid && ($u['role'] ?? '') === 'reseller') {
+                    return ['uid' => (string)$uid, 'user' => $u, 'cfg' => $cfg, 'code' => $code];
+                }
+            }
+            return null;
+        }
+        return null;
+    }
+
+    /**
+     * Credit the shop commission of order $orderId once (guarded by the ledger itself: type commission + ref = order id).
+     * @return int amount credited (0 when none or already credited, see $already)
+     */
+    public static function creditOrder(string $uid, string $orderId, int $amount, string $pct, bool &$already = false): int
+    {
+        $already = false;
+        if ($amount <= 0) {
+            return 0;
+        }
+        [$ok] = self::post($uid, [['type' => 'commission', 'amount' => $amount, 'note' => 'Shop ' . $orderId . ' ' . $pct . '%', 'ref' => $orderId, 'meta' => ['via' => 'shop', 'order' => $orderId], 'once' => true]], false, 'system');
+        $already = !$ok;
+        return $ok ? $amount : 0;
+    }
+
+    /** Reverse a credited shop commission exactly once (ref "rev:<order id>"). Returns the amount reversed. */
+    public static function reverseOrder(string $uid, string $orderId, int $amount): int
+    {
+        if ($amount <= 0) {
+            return 0;
+        }
+        [$ok] = self::post($uid, [['type' => 'commission', 'amount' => -$amount, 'note' => 'Shop refund ' . $orderId, 'ref' => 'rev:' . $orderId, 'meta' => ['via' => 'shop', 'order' => $orderId, 'auto' => 1], 'once' => true]], false, 'system');
+        return $ok ? $amount : 0;
     }
 
     public static function isReseller(?array $u): bool

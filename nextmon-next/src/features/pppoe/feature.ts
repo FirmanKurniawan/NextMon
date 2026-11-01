@@ -4,7 +4,7 @@ import { pppoeApi } from './api.ts';
 
 export default defineFeature({
   id: 'pppoe',
-  nav: [{ key: 'pppoe', href: '/pppoe', icon: 'users', label: 'PPPoE', group: 'Network', order: 20 }],
+  nav: [{ key: 'pppoe', href: '/pppoe', icon: 'users', label: 'PPPoE', group: 'Network', order: 60 }],
   pages: [{ path: '/pppoe', title: 'PPPoE', cap: 'view', page: 'pppoe', scripts: ['/assets/next/net-forms.js'], component: () => import('./page.tsx') }],
   api: { pppoe: pppoeApi },
   i18n: {

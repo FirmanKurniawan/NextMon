@@ -1,11 +1,14 @@
 /** Router backup/export + app settings export (port of BackupController). POST create; GET /api/json/backup?type=... downloads. */
 import { Audit } from '../../lib/audit.ts';
+import * as AB from '../../lib/appbackup.ts';
+import { Net } from '../../lib/net.ts';
 import { Routers } from '../../lib/routers.ts';
 import { getSettings } from '../../lib/store.ts';
 import { Users } from '../../lib/users.ts';
 import { HttpError } from '../../server/guard.ts';
 import { writeRoute } from '../_netkit/mutate.ts';
-import { field } from '../_netkit/util.ts';
+import { field, done, fail } from '../_netkit/util.ts';
+import type { AppContext } from '../types.ts';
 import { exportText } from '../monitor/logic.ts';
 
 const pad = (n: number) => String(n).padStart(2, '0');
@@ -25,8 +28,62 @@ const send = (name: string, mime: string, body: string, bom = false): Response =
     headers: { 'content-type': `${mime}; charset=utf-8`, 'content-disposition': `attachment; filename="${name.replace(/[^A-Za-z0-9_.-]/g, '_')}"`, 'cache-control': 'no-store' },
   });
 
+/** Translated message of a BackupError, or a generic one (details stay in the server log). */
+function msg(ctx: AppContext, e: unknown): string {
+  return e instanceof AB.BackupError ? ctx.t(e.key, e.params) : ctx.t('Server error');
+}
+const limited = (ctx: AppContext, bucket: string, max: number): boolean => Net.hit(bucket, `${ctx.workspace.id}|${ctx.user.id}`, max, 600);
+const tooMany = (ctx: AppContext) => fail(ctx.t('Too many attempts. Try again in :m min.', { ':m': 10 }));
+
 export const backupApi = writeRoute(
   {
+    // ---- app data restore (owner only): 1. check the file, 2. confirm -------------------------------------------------
+    'restore/preview': {
+      cap: 'admin',
+      run: async (ctx, fd) => {
+        if (limited(ctx, 'backup-restore', 12)) return tooMany(ctx);
+        const f = fd.get('file');
+        if (!(f instanceof File) || (f.size === 0 && f.name === '')) return fail(ctx.t('Choose a backup file first.'));
+        if (f.size > AB.MAX_BYTES) return fail(ctx.t('File is too large (max :n MB).', { ':n': AB.MAX_BYTES / 1048576 }));
+        try {
+          const parsed = AB.parseBackup(new TextDecoder('utf-8', { fatal: false }).decode(new Uint8Array(await f.arrayBuffer())));
+          AB.stash(parsed, f.name, ctx.user.id);
+          Audit.log('backup.restore.preview', f.name.slice(0, 80));
+          return { ok: true, message: ctx.t('File checked. Review what will be replaced below.'), reload: true };
+        } catch (e) {
+          if (e instanceof AB.BackupError) Audit.log('backup.restore.rejected', e.message.slice(0, 200));
+          else console.error('[nextmon] backup preview failed', e);
+          return fail(msg(ctx, e));
+        }
+      },
+    },
+    'restore/cancel': {
+      cap: 'admin',
+      run: (ctx) => {
+        AB.discard();
+        return done(ctx.t('Restore cancelled. Nothing was changed.'));
+      },
+    },
+    'restore/apply': {
+      cap: 'admin',
+      run: (ctx, fd) => {
+        if (limited(ctx, 'backup-restore', 12)) return tooMany(ctx);
+        const data = AB.pendingData(ctx.user.id, field(fd, 'token'));
+        if (!data) return fail(ctx.t('The restore preview expired. Upload the file again.'));
+        if (field(fd, 'confirm').toUpperCase() !== 'RESTORE') return fail(ctx.t('Type RESTORE to confirm.'));
+        const sel = fd.getAll('c[]').map(String).filter((c) => Object.hasOwn(AB.COLLECTIONS, c));
+        try {
+          const r = AB.applyBackup(data, sel);
+          AB.discard();
+          Audit.log('backup.restore', `${r.applied.join(',')} safety=${r.safety}`);
+          return done(ctx.t('Restore complete: :c. Previous data saved as :f', { ':c': r.applied.join(', '), ':f': r.safety }));
+        } catch (e) {
+          if (e instanceof AB.BackupError) Audit.log('backup.restore.failed', e.message.slice(0, 200));
+          else console.error('[nextmon] restore failed', e);
+          return fail(msg(ctx, e));
+        }
+      },
+    },
     create: async (ctx, fd) => {
       const r = ctx.driver();
       const name = 'nextmon-' + stamp(new Date(), true);
@@ -48,8 +105,24 @@ export const backupApi = writeRoute(
     async get(ctx, req) {
       const u = new URL(req.url);
       const type = u.searchParams.get('type') ?? '';
-      const r = ctx.driver();
       const day = stamp();
+      if (type === 'appdata' || type === 'safety') {
+        // workspace app data: owner only
+        if (!ctx.can('admin')) throw new HttpError(403, 'Forbidden');
+        if (type === 'appdata') {
+          if (limited(ctx, 'backup-export', 10)) throw new HttpError(429, ctx.t('Too many attempts. Try again in :m min.', { ':m': 10 }));
+          const secrets = u.searchParams.get('secrets') === '1';
+          const body = AB.exportBackup(secrets);
+          Audit.log('backup.export', secrets ? 'with encrypted secrets' : 'no secrets');
+          return send(`nextmon-data-${stamp(new Date(), true)}.json`, 'application/json', body);
+        }
+        const name = u.searchParams.get('name') ?? '';
+        const body = AB.safetyBody(name);
+        if (body === null) throw new HttpError(404, ctx.t('File not found.'));
+        Audit.log('backup.safety.download', name);
+        return send(name + '.json', 'application/json', body);
+      }
+      const r = ctx.driver();
       Audit.log('backup.download', type);
       switch (type) {
         case 'users': {

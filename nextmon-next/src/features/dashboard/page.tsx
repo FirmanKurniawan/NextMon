@@ -251,7 +251,7 @@ export default function DashboardPage({ ctx }: PageProps) {
           <section className={'card glass ' + (live ? 'col-4' : 'col-6')}>
             <div className="card-h">
               <h2>{t('App log')}</h2>
-              <span className="muted">{ctx.workspace.name}</span>
+              {ctx.can('admin') ? <a href="/audit">{t('View all')}</a> : <span className="muted">{ctx.workspace.name}</span>}
             </div>
             <div className="card-b">
               {appLog.length === 0 ? (

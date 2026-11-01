@@ -12,7 +12,7 @@
 <section class="card glass">
   <?php if (!$list) { echo '<div class="card-b">' . empty_state('users', t('No reseller users yet'), t('Create a user with the Reseller role in Settings, then set up the wallet here.'), '<a class="btn btn-primary" href="' . e(url('/settings#users')) . '">' . e(t('Users and roles')) . '</a>') . '</div>'; } else { ?>
   <div class="table-wrap"><table class="tbl resp">
-    <thead><tr><th><?= e(t('Reseller')) ?></th><th><?= e(t('Status')) ?></th><th class="num"><?= e(t('Balance')) ?></th><th class="num"><?= e(t('Commission')) ?></th><th class="num"><?= e(t('Price adj.')) ?></th><th><?= e(t('Profiles')) ?></th><th><span class="sr-only"><?= e(t('Actions')) ?></span></th></tr></thead>
+    <thead><tr><th><?= e(t('Reseller')) ?></th><th><?= e(t('Status')) ?></th><th class="num"><?= e(t('Balance')) ?></th><th class="num"><?= e(t('Commission')) ?></th><th class="num"><?= e(t('Price adj.')) ?></th><th><?= e(t('Profiles')) ?></th><th><?= e(t('Shop referral')) ?></th><th><span class="sr-only"><?= e(t('Actions')) ?></span></th></tr></thead>
     <tbody>
     <?php foreach ($list as $x) { $u = $x['u']; $c = $x['cfg']; $d = $c ?: Reseller::defaults(); ?>
       <tr>
@@ -22,6 +22,11 @@
         <td data-label="<?= e(t('Commission')) ?>" class="num"><?= e(rtrim(rtrim(number_format((float)$d['commission'], 2, '.', ''), '0'), '.')) ?>%</td>
         <td data-label="<?= e(t('Price adj.')) ?>" class="num"><?= e(($d['adj'] > 0 ? '+' : '') . rtrim(rtrim(number_format((float)$d['adj'], 2, '.', ''), '0'), '.')) ?>%</td>
         <td data-label="<?= e(t('Profiles')) ?>" class="wrap"><?= $d['allow_all'] ? '<span class="muted">' . e(t('All')) . '</span>' : (e(implode(', ', array_keys($d['profiles']))) ?: '-') ?></td>
+        <td data-label="<?= e(t('Shop referral')) ?>" class="wrap">
+          <form method="post" action="<?= e(url('/resellers/ref')) ?>" class="row"><?= csrf_field() ?><input type="hidden" name="id" value="<?= e($u['id']) ?>">
+            <input class="input input-sm mono" name="ref" value="<?= e($d['ref'] ?? '') ?>" maxlength="24" pattern="[a-z0-9][a-z0-9\-]{2,23}" placeholder="<?= e(t('code')) ?>" aria-label="<?= e(t('Referral code')) ?>" style="width:9rem"><button class="btn btn-sm"><?= e(t('Save')) ?></button></form>
+          <?php if (!empty($d['ref'])) { ?><div class="help mono">/shop<?= e(Shop::wQuery()) ?><?= Shop::wQuery() === '' ? '?' : '&amp;' ?>ref=<?= e($d['ref']) ?></div><?php } ?>
+        </td>
         <td class="actions" data-label="">
           <button class="btn btn-sm btn-primary" type="button" data-open="#dlg-fund" data-rs-fund="<?= e($u['id']) ?>" data-name="<?= e($u['username']) ?>"><?= icon('plus', 16) ?><span class="hide-m"><?= e(t('Top up')) ?></span></button>
           <button class="btn btn-sm" type="button" data-open="#dlg-rs" data-rs-edit="<?= jattr(['id' => $u['id'], 'username' => $u['username'], 'active' => $d['active'], 'commission' => $d['commission'], 'adj' => $d['adj'], 'credit' => $d['credit'], 'allow_all' => $d['allow_all'], 'profiles' => (object)$d['profiles']]) ?>"><?= icon('edit', 16) ?><span class="hide-m"><?= e(t('Edit')) ?></span></button>

@@ -142,11 +142,12 @@ class OrdersController
         header('Content-Disposition: attachment; filename="orders-' . date('Ymd-His') . '.csv"');
         $out = fopen('php://output', 'w');
         fwrite($out, "\xEF\xBB\xBF");
-        fputcsv($out, ['order', 'created', 'paid_at', 'status', 'package', 'profile', 'amount', 'name', 'phone', 'email', 'gateway', 'gateway_ref', 'voucher', 'fulfil', 'flag'], ',', '"', '');
+        fputcsv($out, ['order', 'created', 'paid_at', 'status', 'package', 'profile', 'amount', 'name', 'phone', 'email', 'gateway', 'gateway_ref', 'voucher', 'fulfil', 'flag', 'reseller_ref', 'commission'], ',', '"', '');
         foreach ($rows as $o) {
             fputcsv($out, array_map($cell, [
                 $o['id'], date('Y-m-d H:i:s', $o['created']), !empty($o['paid_at']) ? date('Y-m-d H:i:s', $o['paid_at']) : '', $o['status'], $o['package']['label'], $o['package']['profile'],
                 $o['amount'], $o['customer']['name'] ?? '', $o['customer']['phone'] ?? '', $o['customer']['email'] ?? '', $o['gateway'], $o['ref'], $o['voucher']['user'] ?? '', $o['fulfil'] ?? '', $o['flag'] ?? '',
+                $o['attr']['code'] ?? '', !empty($o['attr']['credited_at']) && empty($o['attr']['reversed_at']) ? (int)$o['attr']['comm'] : '',
             ]), ',', '"', '');
         }
         fclose($out);

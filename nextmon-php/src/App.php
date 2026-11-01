@@ -79,6 +79,12 @@ final class App
                 self::closeSession();   // slow router I/O below must not hold the session lock (parallel XHR would queue behind it)
             }
             $class::$fn();
+        } catch (QuotaException $e) {
+            // daily voucher limit (Quota): nothing was created; callers that charged something roll back before this point
+            if ($isJson) {
+                self::json(['ok' => false, 'error' => $e->getMessage(), 'used' => $e->used, 'limit' => $e->limit], 429);
+            }
+            self::back(strncmp($path, '/hotspot', 8) === 0 ? '/hotspot/users' : '/vouchers', $e->getMessage(), 'err');
         } catch (RouterOSException $e) {
             self::routerError($e);
         } catch (Throwable $e) {
@@ -477,6 +483,12 @@ final class App
 
     private static function routerError(RouterOSException $e): void
     {
+        if ($e->getMessage() === 'No router configured' && !self::routers() && strncmp(self::path(), '/json/', 6) !== 0) {
+            // empty account (first run): a welcome card instead of a "router unreachable" error, same as the Next.js edition
+            self::render('error', ['title' => t('Welcome to NextMON'), 'code' => 0, 'page' => '', 'routerHelp' => true,
+                'message' => Auth::can('admin') ? t('This account has no router yet. Connect your MikroTik through the RouterOS API, or explore NextMON with a simulated router first.') : t('This account has no router yet. Ask the account owner to add one.')]);
+            return;
+        }
         Audit::log('router.error', $e->getMessage());
         Notify::event('router', 'Router error (' . self::currentRouterId() . '): ' . $e->getMessage());
         if (strncmp(self::path(), '/json/', 6) === 0) {

@@ -216,10 +216,15 @@ final class SqliteStore
 
     // ---- logs ----------------------------------------------------------------------------
 
-    public function append(string $channel, array $row): void
+    /** $cap > 0: exact per-collection cap, trimmed on every append through the (channel, id) index (walks at most $cap entries). */
+    public function append(string $channel, array $row, int $cap = 0): void
     {
         $this->st('INSERT INTO logs (channel, ts, data) VALUES (?, ?, ?)')
             ->execute([$channel, (int)($row['ts'] ?? time()), self::enc($row)]);
+        if ($cap > 0) {
+            $this->prune($channel, $cap);
+            return;
+        }
         if (random_int(1, 200) === 1) {
             $this->prune($channel, self::LOG_KEEP);
         }

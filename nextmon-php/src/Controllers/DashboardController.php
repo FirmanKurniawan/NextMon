@@ -3,6 +3,9 @@ class DashboardController
 {
     public static function index(): void
     {
+        if (!App::routers()) {
+            throw new RouterOSException('No router configured');   // empty account: the welcome card (App::routerError), not a dead dashboard
+        }
         App::render('dashboard', [
             'title' => t('Dashboard'),
             'page' => 'dashboard',

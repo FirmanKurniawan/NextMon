@@ -10,7 +10,7 @@ import path from 'node:path';
 import { Context } from './context.ts';
 import { randomHex } from './crypto.ts';
 import { Env } from './env.ts';
-import { NoWorkspaceError, Store, WS_ID_RE } from './store.ts';
+import { NoWorkspaceError, setLogCapResolver, Store, WS_ID_RE } from './store.ts';
 import { Users } from './users.ts';
 import type { User } from './users.ts';
 
@@ -73,7 +73,9 @@ export const Workspace = {
   /** Platform defaults overlaid with the per-workspace override. */
   limits(id: string): Limits {
     const plat = Store.global('platform').read<{ default_limits?: Partial<Limits> }>({}).default_limits ?? {};
-    return { ...DEFAULT_LIMITS, ...plat, ...(Workspace.get(id)?.limits ?? {}) };
+    const rec = Workspace.get(id);
+    const base = rec?.slug === 'main' ? { routers: 0, staff: 0, vouchers_per_day: 0, log_rows: 0 } : { ...DEFAULT_LIMITS, ...plat }; // `main` is unlimited unless overridden
+    return { ...base, ...(rec?.limits ?? {}) };
   },
 
   /**
@@ -154,3 +156,5 @@ export const Workspace = {
     return p;
   },
 };
+
+setLogCapResolver((ws) => Workspace.limits(ws).log_rows);

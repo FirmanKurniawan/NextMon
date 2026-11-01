@@ -131,7 +131,7 @@ export default async function VouchersPage({ ctx }: PageProps) {
               </div>
               <div className="field">
                 <label htmlFor="g-cs">{t('Characters')}</label>
-                <select className="select" id="g-cs" name="charset" defaultValue="lowernum">
+                <select className="select" id="g-cs" name="charset" defaultValue="safe">
                   {CHARSETS.map(([k, l]) => (
                     <option key={k} value={k}>
                       {t(l)}

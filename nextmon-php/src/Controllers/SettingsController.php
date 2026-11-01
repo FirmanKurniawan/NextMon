@@ -7,7 +7,7 @@ class SettingsController
         unset($_SESSION['newkey']);
         App::render('settings', [
             'title' => t('Settings'), 'page' => 'settings', 's' => Store::settings(), 'users' => Auth::users(),
-            'keys' => (array)Store::read('apikeys', []), 'newKey' => $newKey, 'forced' => App::demoForced(),
+            'keys' => (array)Store::read('apikeys', []), 'newKey' => $newKey, 'forced' => App::demoForced(), 'plan' => Quota::plan(),
         ]);
     }
 
