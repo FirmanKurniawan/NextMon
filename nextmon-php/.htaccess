@@ -1,0 +1,12 @@
+# Use this only when the whole nextmon-php folder is the web root (shared hosting without a "public" docroot option).
+# Better: point the domain/docroot to nextmon-php/public (see deploy/apache.conf, deploy/nginx.conf).
+Options -Indexes
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # never serve code, data, tooling, docs
+  RewriteRule ^(src|lang|data|bin|tests|deploy|docs)(/|$) - [F,L]
+  RewriteRule ^(cron\.php|Dockerfile|README\.md|web\.config|\.dockerignore|\.htaccess)$ - [F,L]
+  RewriteRule (^|/)\.(?!well-known) - [F,L]
+  RewriteCond %{REQUEST_URI} !/public/
+  RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>

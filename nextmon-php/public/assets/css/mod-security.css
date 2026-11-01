@@ -1,0 +1,17 @@
+/* Security / reseller / import modules. Only composes the stable classes from app.css; module-specific bits live here. */
+
+/* resellers */
+.rs-balance { font-variant-numeric: tabular-nums; }
+.rs-neg { color: var(--err); }
+.rs-pos { color: var(--ok); }
+.rs-profiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: var(--s2); }
+.rs-profiles label { display: flex; align-items: center; gap: var(--s2); padding: var(--s2) var(--s3); border: 1px solid var(--border); border-radius: var(--r2); font-size: var(--fs-13); }
+.rs-profiles input[type=number] { width: 5.5em; margin-left: auto; }
+.rs-filters .input, .rs-filters .select { min-width: 130px; }
+
+/* import */
+.imp-sum { display: flex; flex-wrap: wrap; gap: var(--s2); margin-bottom: var(--s3); }
+.imp-row-err td { background: var(--err-soft); }
+.imp-row-dup td { background: var(--warn-soft); }
+.imp-drop { border: 2px dashed var(--border-strong); border-radius: var(--r2); padding: var(--s5); text-align: center; }
+.imp-cols code { display: inline-block; margin: 2px; padding: 1px 6px; background: var(--surface-2); border-radius: var(--r1); font-size: var(--fs-12); }

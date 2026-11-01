@@ -1,0 +1,39 @@
+{
+  "name": "nextmon-next",
+  "version": "0.1.0",
+  "private": true,
+  "description": "NextMON - Next.js edition (multi-tenant MikroTik hotspot manager)",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "scripts": {
+    "gen": "node scripts/gen-features.mjs",
+    "sync-assets": "node scripts/sync-assets.mjs",
+    "dev": "node scripts/dev.mjs",
+    "prebuild": "node scripts/gen-features.mjs && node scripts/sync-assets.mjs --if-missing",
+    "build": "next build && node scripts/postbuild.mjs",
+    "start": "node .next/standalone/server.js",
+    "lint": "node scripts/gen-features.mjs && eslint .",
+    "typecheck": "node scripts/gen-features.mjs && tsc --noEmit",
+    "test": "node scripts/gen-features.mjs && vitest run",
+    "test:watch": "vitest",
+    "cli": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/cli.mts"
+  },
+  "dependencies": {
+    "next": "15.5.28",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.7",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "15.5.28",
+    "typescript": "~5.9.0",
+    "vitest": "^3.2.0"
+  }
+}

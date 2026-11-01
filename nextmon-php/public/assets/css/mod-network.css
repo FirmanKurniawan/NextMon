@@ -1,0 +1,39 @@
+/* Network module (monitor, pppoe, dhcp, arp, walled garden, wizard). Uses design tokens from app.css only. */
+.nm-chart { width: 100%; height: 150px; display: block; overflow: visible; }
+.nm-chart.nm-mini { height: 44px; }
+.nm-grid { stroke: var(--grid); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.nm-axis { fill: var(--muted); font-size: 10px; font-family: var(--mono); }
+.nm-line { fill: none; stroke-width: 1.75; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.nm-l1 { stroke: var(--chart-1); } .nm-l2 { stroke: var(--chart-3); } .nm-l3 { stroke: var(--chart-5); }
+.nm-down { fill: var(--err-soft); }
+.nm-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--s4); margin-bottom: var(--s4); }
+.nm-card .card-b { display: flex; flex-direction: column; gap: var(--s3); }
+.nm-card.is-sel { outline: 2px solid var(--accent); outline-offset: -2px; }
+.nm-head { display: flex; align-items: center; gap: var(--s3); justify-content: space-between; }
+.nm-head a { font-weight: 600; color: var(--text); text-decoration: none; }
+.nm-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s3); }
+.nm-metrics b { display: block; font-size: var(--fs-20); font-weight: 650; letter-spacing: -.01em; }
+.nm-metrics span { color: var(--muted); font-size: var(--fs-12); }
+.nm-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--muted); margin-right: var(--s2); }
+.nm-dot.on { background: var(--ok); } .nm-dot.off { background: var(--err); }
+.nm-charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s4); }
+.nm-charts h3 { margin: 0 0 var(--s2); font-size: var(--fs-14); display: flex; justify-content: space-between; align-items: baseline; }
+.nm-legend { display: flex; gap: var(--s4); font-size: var(--fs-12); color: var(--muted); }
+.nm-legend i { display: inline-block; width: 10px; height: 3px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+.nm-rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--s4); }
+.nm-rule { border: 1px solid var(--border); border-radius: var(--r2); padding: var(--s4); display: flex; flex-direction: column; gap: var(--s3); }
+.nm-rule h3 { margin: 0; font-size: var(--fs-14); }
+.nm-pre { font-family: var(--mono); font-size: var(--fs-12); background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r2); padding: var(--s3); overflow: auto; white-space: pre-wrap; word-break: break-all; margin: 0; }
+.nm-steps { counter-reset: st; list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--s4); }
+.nm-step { border: 1px solid var(--border); border-radius: var(--r3); background: var(--surface-solid); }
+.nm-step > .nm-step-h { display: flex; align-items: center; gap: var(--s3); padding: var(--s3) var(--s4); }
+.nm-step > .nm-step-h::before { counter-increment: st; content: counter(st); width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-text); display: grid; place-items: center; font-weight: 650; font-size: var(--fs-13); flex: none; }
+.nm-step-h h2 { margin: 0; font-size: var(--fs-16); flex: 1; }
+.nm-step-b { padding: 0 var(--s4) var(--s4); display: flex; flex-direction: column; gap: var(--s3); }
+.nm-log { display: flex; flex-direction: column; gap: var(--s1); font-size: var(--fs-13); }
+.nm-log div { display: flex; gap: var(--s2); align-items: baseline; }
+.nm-wrap-cell { white-space: normal; overflow-wrap: anywhere; }
+.nm-toolbar { display: flex; flex-wrap: wrap; gap: var(--s3); align-items: center; padding: var(--s3) var(--s4); }
+.nm-toolbar form.nm-q { display: flex; gap: var(--s2); flex: 1; min-width: 200px; }
+.nm-toolbar .input { max-width: 340px; }
+@media (max-width: 760px) { .nm-charts { grid-template-columns: 1fr; } .nm-metrics b { font-size: var(--fs-16); } }

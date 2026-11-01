@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="expires" content="-1">
+<title>Terjadi masalah - {brand}</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/app.css">
+<script>try{var __t=localStorage.getItem('hs_theme');if(__t==='dark'||__t==='light')document.documentElement.setAttribute('data-theme',__t)}catch(e){}</script>
+</head>
+<body>
+<div class="bg" aria-hidden="true"></div>
+
+<main class="wrap">
+  <section class="card" aria-labelledby="title">
+    <header class="top">
+      <div class="brand">
+        <img data-logo src="img/logo.svg" alt="">
+        <div style="min-width:0">
+          <div class="brand-name" data-brand>WiFi</div>
+          <div class="brand-tag" data-tagline></div>
+        </div>
+      </div>
+      <button type="button" class="iconbtn" id="theme-btn" aria-label="Ganti tema"></button>
+    </header>
+
+    <div class="hero">
+      <div class="badge bad" aria-hidden="true"><i data-icon="alert" data-class="lg"></i></div>
+      <div style="min-width:0">
+        <h1 id="title">Belum bisa terhubung</h1>
+        <p class="lead">Terjadi masalah saat memproses permintaan Anda.</p>
+      </div>
+    </div>
+
+    <div class="alert error" role="alert" style="margin-top:24px">
+      <i data-icon="alert"></i>
+      <div><span id="error-text"></span><span class="detail" id="error-detail" hidden></span></div>
+    </div>
+
+    <div class="actions">
+      <a class="btn" href="$(link-login)"><i data-icon="login"></i>Kembali ke halaman masuk</a>
+    </div>
+
+    <dl class="meta">
+      <dt>Alamat IP</dt><dd>$(ip)</dd>
+      <dt>MAC</dt><dd>$(mac)</dd>
+    </dl>
+  </section>
+  <p class="foot"><span data-brand>WiFi</span> &middot; $(identity)</p>
+</main>
+
+<div id="hs-error" hidden>$(error)</div>
+<div id="hs-error-orig" hidden>$(error-orig)</div>
+<script src="js/config.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/app.js"></script>
+<script>
+(function () {
+  function val(id) { var s = (document.getElementById(id).textContent || '').replace(/^\s+|\s+$/g, ''); return s.indexOf('\x24(') === 0 ? '' : s; }
+  var raw = val('hs-error'), orig = val('hs-error-orig');
+  HSApp.init();
+  var friendly = HSApp.friendlyError(raw || orig);
+  document.getElementById('error-text').textContent = friendly || HSApp.t('err_generic');
+  var d = document.getElementById('error-detail'), detail = [raw, orig].filter(function (x, i, a) { return x && x !== friendly && a.indexOf(x) === i; }).join(' - ');
+  if (detail) { d.textContent = detail; d.hidden = false; }
+})();
+</script>
+</body>
+</html>

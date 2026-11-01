@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Voucher {{brand}} - Thermal 58mm</title>
+<!--
+  Template: printer thermal 58mm (area cetak efektif ~48-54mm). Satu voucher = satu potongan struk.
+  Placeholder: {{username}} {{password}} {{price}} {{validity}} {{profile}} {{qr}} {{dns}} {{brand}}
+  Ulangi elemen [data-voucher] per voucher. Di dialog cetak: margin = None/0, skala 100%.
+-->
+<style>
+  @page { size: 58mm auto; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #e9ecf1; }
+  body { font-family: "Courier New", Consolas, monospace; color: #000; }
+  .roll { width: 58mm; margin: 6mm auto; background: #fff; }
+  .v { width: 58mm; padding: 3mm 4mm 4mm; text-align: center; border-bottom: .3mm dashed #000; break-inside: avoid; page-break-inside: avoid; }
+  .brand { font-size: 4.4mm; font-weight: 900; letter-spacing: .3mm; text-transform: uppercase; }
+  .sub { font-size: 2.8mm; margin-bottom: 1.5mm; }
+  hr { border: 0; border-top: .3mm solid #000; margin: 1.5mm 0; }
+  .row { display: flex; justify-content: space-between; font-size: 3mm; line-height: 1.5; }
+  .code { font-size: 5.2mm; font-weight: 900; letter-spacing: .2mm; word-break: break-all; border: .4mm solid #000; padding: 1mm; margin: 1mm 0; }
+  .v img { width: 28mm; height: 28mm; image-rendering: pixelated; display: block; margin: 1.5mm auto 0; }
+  .foot { font-size: 2.6mm; margin-top: 1mm; }
+  @media print { html, body { background: #fff; } .roll { margin: 0; } }
+</style>
+</head>
+<body>
+<main class="roll">
+  <div class="v" data-voucher>
+    <div class="brand">{{brand}}</div>
+    <div class="sub">WiFi Voucher</div>
+    <hr>
+    <div class="row"><span>Username</span></div>
+    <div class="code">{{username}}</div>
+    <div class="row"><span>Password</span></div>
+    <div class="code">{{password}}</div>
+    <hr>
+    <div class="row"><span>Paket</span><span>{{profile}}</span></div>
+    <div class="row"><span>Durasi</span><span>{{validity}}</span></div>
+    <div class="row"><b>Harga</b><b>{{price}}</b></div>
+    <img src="{{qr}}" alt="QR">
+    <div class="foot">Scan / buka http://{{dns}}</div>
+  </div>
+</main>
+<script src="qr.js"></script>
+<script src="fill.js"></script>
+</body>
+</html>

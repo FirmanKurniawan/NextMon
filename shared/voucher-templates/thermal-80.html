@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Voucher {{brand}} - Thermal 80mm</title>
+<!--
+  Template: printer thermal 80mm (area cetak efektif ~72mm). Layout dua kolom: kode di kiri, QR di kanan.
+  Placeholder: {{username}} {{password}} {{price}} {{validity}} {{profile}} {{qr}} {{dns}} {{brand}}
+  Ulangi elemen [data-voucher] per voucher. Di dialog cetak: margin = None/0, skala 100%.
+-->
+<style>
+  @page { size: 80mm auto; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #e9ecf1; }
+  body { font-family: "Segoe UI", Arial, sans-serif; color: #000; }
+  .roll { width: 80mm; margin: 6mm auto; background: #fff; }
+  .v { width: 80mm; padding: 4mm 4mm 5mm; border-bottom: .3mm dashed #000; break-inside: avoid; page-break-inside: avoid; }
+  .head { display: flex; justify-content: space-between; align-items: baseline; border-bottom: .5mm solid #000; padding-bottom: 1.2mm; }
+  .brand { font-size: 5mm; font-weight: 900; text-transform: uppercase; letter-spacing: .3mm; }
+  .price { font-size: 4.4mm; font-weight: 800; }
+  .body { display: grid; grid-template-columns: 1fr 30mm; gap: 3mm; margin-top: 2mm; align-items: center; }
+  .lbl { font-size: 2.6mm; text-transform: uppercase; color: #333; letter-spacing: .2mm; margin-top: 1mm; }
+  .code { font-family: Consolas, "Courier New", monospace; font-size: 5.4mm; font-weight: 900; word-break: break-all; line-height: 1.15; }
+  .v img { width: 30mm; height: 30mm; image-rendering: pixelated; }
+  .meta { display: flex; justify-content: space-between; font-size: 3mm; margin-top: 2mm; border-top: .3mm solid #000; padding-top: 1.2mm; }
+  .foot { text-align: center; font-size: 2.8mm; margin-top: 1mm; }
+  @media print { html, body { background: #fff; } .roll { margin: 0; } }
+</style>
+</head>
+<body>
+<main class="roll">
+  <div class="v" data-voucher>
+    <div class="head"><span class="brand">{{brand}}</span><span class="price">{{price}}</span></div>
+    <div class="body">
+      <div>
+        <div class="lbl">Username</div><div class="code">{{username}}</div>
+        <div class="lbl">Password</div><div class="code">{{password}}</div>
+      </div>
+      <img src="{{qr}}" alt="QR">
+    </div>
+    <div class="meta"><span>Paket: {{profile}}</span><span>Durasi: {{validity}}</span></div>
+    <div class="foot">Hubungkan WiFi lalu buka http://{{dns}}</div>
+  </div>
+</main>
+<script src="qr.js"></script>
+<script src="fill.js"></script>
+</body>
+</html>

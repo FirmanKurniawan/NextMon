@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Voucher {{brand}} - Glass card</title>
+<!--
+  Template: kartu bergaya kaca (glass) terkendali, satu rona biru-teal; ukuran 85.6 x 54 mm (kartu kredit), 2 kolom x 5 baris = 10 / halaman A4.
+  Aktifkan "Background graphics" di dialog cetak agar warna latar tercetak.
+  Placeholder: {{username}} {{password}} {{price}} {{validity}} {{profile}} {{qr}} {{dns}} {{brand}}
+  Ulangi elemen [data-voucher] per voucher.
+-->
+<style>
+  @page { size: A4 portrait; margin: 10mm 9mm; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #e9ecf1; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif; color: #fff; }
+  .sheet { width: 192mm; margin: 10mm auto; display: grid; grid-template-columns: repeat(2, 85.6mm); gap: 5mm 6mm; justify-content: center; }
+  .v { position: relative; width: 85.6mm; height: 54mm; border-radius: 4mm; overflow: hidden; padding: 4mm 4.5mm;
+       background: linear-gradient(135deg, #0c4a6e 0%, #0f766e 100%);
+       break-inside: avoid; page-break-inside: avoid; box-shadow: 0 1mm 3mm rgba(0,0,0,.35); }
+  .glass { position: absolute; inset: 2.5mm; border-radius: 3mm; background: rgba(255,255,255,.12); border: .3mm solid rgba(255,255,255,.28);
+           -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+  .in { position: relative; height: 100%; display: grid; grid-template-columns: 1fr 24mm; grid-template-rows: auto 1fr auto; gap: 1mm 3mm; padding: 1.5mm 2mm; }
+  .top { grid-column: 1 / 3; display: flex; justify-content: space-between; align-items: center; }
+  .brand { font-weight: 800; letter-spacing: .4mm; font-size: 4mm; text-transform: uppercase; }
+  .price { background: #fff; color: #0c4a6e; font-weight: 800; font-size: 3.2mm; padding: .4mm 2.2mm; border-radius: 4mm; }
+  .lbl { font-size: 2.2mm; text-transform: uppercase; letter-spacing: .3mm; opacity: .8; margin-top: 1mm; }
+  .code { font-family: "JetBrains Mono", Consolas, "Courier New", monospace; font-weight: 800; font-size: 5mm; word-break: break-all; line-height: 1.1; }
+  .qr { background: #fff; border-radius: 2mm; padding: 1mm; align-self: center; width: 24mm; height: 24mm; }
+  .qr img { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+  .bot { grid-column: 1 / 3; display: flex; justify-content: space-between; font-size: 2.6mm; opacity: .92; }
+  @media print { html, body { background: #fff; } .sheet { margin: 0; width: auto; } .v { box-shadow: none; } }
+</style>
+</head>
+<body>
+<main class="sheet">
+  <div class="v" data-voucher>
+    <div class="glass"></div>
+    <div class="in">
+      <div class="top"><span class="brand">{{brand}}</span><span class="price">{{price}}</span></div>
+      <div>
+        <div class="lbl">Username</div><div class="code">{{username}}</div>
+        <div class="lbl">Password</div><div class="code">{{password}}</div>
+      </div>
+      <div class="qr"><img src="{{qr}}" alt="QR"></div>
+      <div class="bot"><span>{{profile}} &middot; {{validity}}</span><span>{{dns}}</span></div>
+    </div>
+  </div>
+</main>
+<script src="qr.js"></script>
+<script src="fill.js"></script>
+</body>
+</html>

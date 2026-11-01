@@ -1,0 +1,23 @@
+# Apache / XAMPP / shared hosting: send everything that is not a real file to the front controller
+Options -Indexes -MultiViews
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+  RewriteRule ^ index.php [L,QSA]
+</IfModule>
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+</IfModule>
+# no hidden / secret / backup material from here, whatever someone drops into public/
+<FilesMatch "^\.|\.(key|db|sqlite3?|log|bak|sql|rsc|backup|lock|ini|dist)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+AddType application/manifest+json .webmanifest

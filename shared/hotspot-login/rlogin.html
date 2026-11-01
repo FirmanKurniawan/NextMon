@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="expires" content="-1">
+<title>Mengalihkan...</title>
+<noscript><meta http-equiv="refresh" content="0; url=$(link-login)"></noscript>
+</head>
+<body>
+<!-- Sends the client back to the login page while keeping the original destination. -->
+<form name="redirect" action="/login" method="post">
+  <input type="hidden" name="dst" value="$(link-redirect)">
+  <input type="hidden" name="popup" value="true">
+  <noscript><button type="submit">Lanjut</button></noscript>
+</form>
+<script>document.redirect.submit();</script>
+</body>
+</html>

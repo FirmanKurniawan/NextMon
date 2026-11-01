@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Voucher {{brand}} - A4 grid</title>
+<!--
+  Template: A4 grid, 3 kolom x 9 baris = 27 voucher / halaman.
+  Generator: ulangi elemen [data-voucher] untuk setiap voucher, ganti placeholder
+  {{username}} {{password}} {{price}} {{validity}} {{profile}} {{qr}} {{dns}} {{brand}}.
+  {{qr}} = data-URL gambar (SVG/PNG) QR login. Untuk voucher 1-kode, {{password}} = {{username}}.
+-->
+<style>
+  @page { size: A4 portrait; margin: 8mm; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #e9ecf1; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: "Segoe UI", Roboto, Arial, sans-serif; color: #111; }
+  .sheet { width: 194mm; margin: 8mm auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; background: #fff; }
+  .v { height: 31mm; border: .3mm dashed #888; padding: 2mm 2.5mm; display: grid; grid-template-columns: 1fr 22mm; gap: 2mm;
+       break-inside: avoid; page-break-inside: avoid; overflow: hidden; }
+  .v .l { display: flex; flex-direction: column; min-width: 0; }
+  .brand { font-weight: 800; font-size: 3.6mm; letter-spacing: .3mm; text-transform: uppercase; color: #0e7490; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lbl { font-size: 2.1mm; color: #666; text-transform: uppercase; letter-spacing: .2mm; margin-top: 1.2mm; }
+  .code { font-family: "JetBrains Mono", Consolas, "Courier New", monospace; font-weight: 700; font-size: 4.2mm; line-height: 1.15; word-break: break-all; }
+  .meta { margin-top: auto; font-size: 2.4mm; color: #333; display: flex; justify-content: space-between; gap: 1mm; }
+  .meta b { font-size: 3mm; color: #000; }
+  .v .r { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .v .r img { width: 20mm; height: 20mm; image-rendering: pixelated; }
+  .v .r small { font-size: 1.9mm; color: #555; margin-top: .5mm; max-width: 22mm; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  @media print { html, body { background: #fff; } .sheet { margin: 0; width: auto; } }
+</style>
+</head>
+<body>
+<main class="sheet">
+  <div class="v" data-voucher>
+    <div class="l">
+      <div class="brand">{{brand}}</div>
+      <div class="lbl">Username</div><div class="code">{{username}}</div>
+      <div class="lbl">Password</div><div class="code">{{password}}</div>
+      <div class="meta"><span>{{validity}}</span><b>{{price}}</b></div>
+    </div>
+    <div class="r"><img src="{{qr}}" alt="QR"><small>{{dns}}</small></div>
+  </div>
+</main>
+<script src="qr.js"></script>
+<script src="fill.js"></script>
+</body>
+</html>

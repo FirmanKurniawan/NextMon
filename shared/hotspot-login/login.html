@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="expires" content="-1">
+<title>Masuk WiFi - {brand}</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/app.css">
+<script>try{var __t=localStorage.getItem('hs_theme');if(__t==='dark'||__t==='light')document.documentElement.setAttribute('data-theme',__t)}catch(e){}</script>
+</head>
+<body>
+<div class="bg" aria-hidden="true"></div>
+
+<main class="wrap">
+  <section class="card" aria-labelledby="title">
+    <header class="top">
+      <div class="brand">
+        <img data-logo src="img/logo.svg" alt="">
+        <div style="min-width:0">
+          <div class="brand-name" data-brand>WiFi</div>
+          <div class="brand-tag" data-tagline></div>
+        </div>
+      </div>
+      <button type="button" class="iconbtn" id="theme-btn" aria-label="Ganti tema"></button>
+    </header>
+
+    <h1 id="title">Masuk ke WiFi</h1>
+    <p class="lead">Masukkan kode voucher untuk mulai berselancar.</p>
+
+    <div style="margin-top:16px"><span class="chip off" id="net-chip" role="status" data-locked="Belum masuk &middot; internet terkunci">Belum masuk &middot; internet terkunci</span></div>
+
+    <noscript><div class="alert error" style="margin-top:16px"><i data-icon="alert"></i><div>Halaman ini memerlukan JavaScript. Aktifkan JavaScript pada browser Anda lalu muat ulang.</div></div></noscript>
+
+    <div class="alert error" id="error" role="alert" style="margin-top:16px" hidden>
+      <i data-icon="alert"></i>
+      <div><span id="error-text"></span><span class="detail" id="error-detail" hidden></span></div>
+    </div>
+
+    <!-- The real form posted to the router. Visible inputs below have NO name, so the plain password is never sent when CHAP is on. -->
+    <form name="login" id="login" action="$(link-login-only)" method="post" novalidate class="stack" style="margin-top:24px">
+      <input type="hidden" name="username" value="">
+      <input type="hidden" name="password" value="">
+      <input type="hidden" name="dst" value="$(link-orig)">
+      <input type="hidden" name="popup" value="true">
+
+      <div class="seg" id="seg" role="group" aria-label="Cara masuk">
+        <button type="button" data-mode="single" aria-pressed="true">Kode voucher</button>
+        <button type="button" data-mode="userpass" aria-pressed="false">Username</button>
+      </div>
+
+      <div id="grp-single" class="field">
+        <label for="code">Kode voucher</label>
+        <div class="input code">
+          <i data-icon="ticket"></i>
+          <input id="code" type="text" inputmode="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="mis. ab12cd" maxlength="64">
+          <button type="button" class="ghost" id="scan-btn" aria-label="Scan QR voucher" title="Scan QR voucher"><i data-icon="scan"></i></button>
+        </div>
+        <p class="hint">Kode ada di kartu voucher. Pakai QR di kartu untuk masuk lebih cepat.</p>
+      </div>
+
+      <div id="grp-userpass" hidden>
+        <div class="field">
+          <label for="user">Username</label>
+          <div class="input"><i data-icon="user"></i><input id="user" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="64"></div>
+        </div>
+        <div class="field" style="margin-top:16px">
+          <label for="pass">Kata sandi</label>
+          <div class="input"><i data-icon="lock"></i><input id="pass" type="password" autocomplete="current-password" maxlength="64"><button type="button" class="ghost" id="toggle-pass"></button></div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn" id="go"><span class="spin" aria-hidden="true"></span><i data-icon="wifi"></i><span id="submit-label">Hubungkan</span></button>
+    </form>
+
+    $(if trial == 'yes')
+    <p class="center" style="margin-top:16px;font-size:14px">
+      Coba gratis? <a href="$(link-login-only)?dst=$(link-orig-esc)&amp;username=T-$(mac-esc)">Mulai sesi percobaan</a>
+    </p>
+    $(endif)
+
+    <p class="center" id="support" style="margin-top:20px;font-size:14px">
+      <a id="support-wa" href="#" rel="noopener"><span id="support-text">Hubungi admin</span></a>
+      <span class="hint" id="support-hours" style="display:block;margin-top:4px"></span>
+    </p>
+
+    <dl class="meta">
+      <dt>Alamat IP</dt><dd>$(ip)</dd>
+      <dt>MAC</dt><dd>$(mac)</dd>
+    </dl>
+  </section>
+  <p class="foot"><span data-brand>WiFi</span> &middot; $(identity)</p>
+</main>
+
+<dialog class="scan" id="scan-dialog" aria-labelledby="scan-title">
+  <div class="scan-head">
+    <h2 id="scan-title">Scan QR voucher</h2>
+    <button type="button" class="iconbtn" data-close aria-label="Tutup"><i data-icon="x"></i></button>
+  </div>
+  <div class="scan-body">
+    <div class="viewport">
+      <video playsinline muted></video>
+      <canvas class="work" hidden></canvas>
+      <div class="frame" aria-hidden="true"></div>
+      <div class="empty" hidden></div>
+    </div>
+    <p class="scan-status" role="status" aria-live="polite"></p>
+    <label class="btn secondary" style="cursor:pointer">
+      <i data-icon="camera"></i><span>Ambil foto QR</span>
+      <input type="file" accept="image/*" capture="environment" class="sr-only">
+    </label>
+  </div>
+</dialog>
+
+<!-- Values the router substitutes. Kept in a NON-strict inline script on purpose: chap-id contains octal escapes. -->
+<div id="hs-error" hidden>$(error)</div>
+<div id="hs-username" hidden>$(username)</div>
+<script src="md5.js"></script>
+<script>
+var HS = {
+  chapId: '$(chap-id)',
+  chapChallenge: '$(chap-challenge)',
+  error: (document.getElementById('hs-error').textContent || '').replace(/^\s+|\s+$/g, ''),
+  username: (document.getElementById('hs-username').textContent || '').replace(/^\s+|\s+$/g, '')
+};
+/* some RouterOS versions leave the raw placeholder text when a variable is unset on some versions - treat that as empty */
+if (HS.chapId.indexOf('\x24(') === 0) { HS.chapId = ''; HS.chapChallenge = ''; }
+if (HS.error.indexOf('\x24(') === 0) HS.error = '';
+if (HS.username.indexOf('\x24(') === 0) HS.username = '';
+</script>
+<script src="js/config.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/qr-scan.js"></script>
+<script src="js/app.js"></script>
+<script>HSApp.initLogin(HS);</script>
+</body>
+</html>

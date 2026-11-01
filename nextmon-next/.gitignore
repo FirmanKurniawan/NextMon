@@ -1,0 +1,15 @@
+node_modules/
+.next/
+data/
+.env
+.env.local
+*.tsbuildinfo
+next-env.d.ts
+src/features/_generated.ts
+public/assets/css/
+public/assets/js/
+public/assets/icons/
+public/assets/icon.svg
+public/assets/brand/
+public/offline.html
+.test-tmp/

@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="id" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NextMON - design system preview (static, no PHP)</title>
+<meta name="theme-color" content="#0b7285">
+<link rel="stylesheet" href="../assets/css/app.css">
+<script src="../assets/js/theme.js"></script>
+</head>
+<body data-page="preview" data-base="" data-lang="id">
+<a class="skip" href="#main">Lewati ke konten</a>
+<div class="bg" aria-hidden="true"></div>
+<div class="app">
+  <aside class="sidebar glass" id="sidebar" aria-label="Navigasi utama">
+    <a class="brand" href="#"><span class="brand-mark"><svg class="brand-glyph" width="18" height="18" viewBox="7 6 50 50" aria-hidden="true"><g transform="translate(-4 3)" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 46V20l22 26V26" stroke-width="5.6"/><path d="M41.4 18.1A8 8 0 0 1 47.9 24.6" stroke-width="4.4"/><path d="M42.6 11.2A15 15 0 0 1 54.8 23.4" stroke-width="4.4" stroke-opacity="0.8"/></g></svg></span><span>NextMON</span></a>
+    <nav>
+      <div class="nav-title">Ringkasan</div>
+      <a class="nav-link" href="#dash" data-key="dashboard" aria-label="Dasbor" aria-current="page"><i data-ic="home" data-s="18"></i><span class="nav-label">Dasbor</span></a>
+      <div class="nav-title">Hotspot</div>
+      <a class="nav-link" href="#tbl" data-key="users" aria-label="User hotspot"><i data-ic="users" data-s="18"></i><span class="nav-label">User hotspot</span></a>
+      <a class="nav-link" href="#forms" data-key="vouchers" aria-label="Voucher"><i data-ic="ticket" data-s="18"></i><span class="nav-label">Voucher</span></a>
+      <a class="nav-link" href="#feedback" data-key="active" aria-label="Sesi aktif"><i data-ic="activity" data-s="18"></i><span class="nav-label">Sesi aktif</span></a>
+      <div class="nav-title">Penjualan</div>
+      <a class="nav-link" href="#charts" data-key="reports" aria-label="Laporan penjualan"><i data-ic="chart" data-s="18"></i><span class="nav-label">Laporan penjualan</span></a>
+      <div class="nav-title">Sistem</div>
+      <a class="nav-link" href="#overlay" data-key="settings" aria-label="Pengaturan"><i data-ic="settings" data-s="18"></i><span class="nav-label">Pengaturan</span></a>
+    </nav>
+    <div class="sb-foot"><span class="live-dot" aria-hidden="true"></span><b>Demo Router</b></div>
+  </aside>
+  <div class="shell">
+    <header class="topbar glass">
+      <button class="btn btn-ghost btn-icon menu-btn" type="button" data-drawer-open aria-label="Buka menu"><i data-ic="menu"></i></button>
+      <button class="btn btn-ghost btn-icon hide-m" type="button" data-sidebar-toggle aria-label="Ciutkan sidebar"><i data-ic="sidebar"></i></button>
+      <div class="crumbs"><span class="hide-m">NextMON</span><span class="hide-m sep">/</span><b>Pratinjau design system</b></div>
+      <div class="spacer"></div>
+      <button class="btn btn-sm" type="button" data-palette-open><i data-ic="search" data-s="16"></i><span class="hide-m">Cari</span><kbd class="hide-m">Ctrl K</kbd></button>
+      <details class="menu"><summary class="btn btn-ghost btn-icon" aria-label="Akun"><span class="avatar">A</span></summary>
+        <div class="menu-pop">
+          <div class="who"><span class="avatar">A</span><div><b>admin</b><span>Admin</span></div></div><hr>
+          <div class="opt"><span class="lbl" style="padding:0">Tema</span>
+            <div class="seg"><button type="button" data-theme-set="light" aria-pressed="false" aria-label="Terang"><i data-ic="sun" data-s="16"></i></button><button type="button" data-theme-set="auto" aria-pressed="false">Auto</button><button type="button" data-theme-set="dark" aria-pressed="false" aria-label="Gelap"><i data-ic="moon" data-s="16"></i></button></div></div>
+          <div class="lbl">Aksen</div>
+          <div class="swatches" role="group"><button type="button" class="swatch" data-accent-set="teal" aria-pressed="false" aria-label="Teal"></button><button type="button" class="swatch" data-accent-set="blue" aria-pressed="false" aria-label="Blue"></button><button type="button" class="swatch" data-accent-set="violet" aria-pressed="false" aria-label="Violet"></button><button type="button" class="swatch" data-accent-set="emerald" aria-pressed="false" aria-label="Emerald"></button><button type="button" class="swatch" data-accent-set="rose" aria-pressed="false" aria-label="Rose"></button></div>
+          <div class="opt"><span class="lbl" style="padding:0">Kepadatan</span>
+            <div class="seg"><button type="button" data-density-set="compact" aria-pressed="false">Ringkas</button><button type="button" data-density-set="comfortable" aria-pressed="false">Lega</button></div></div>
+          <hr><button class="item" type="button" data-help-open><i data-ic="key" data-s="16"></i>Tampilkan pintasan<kbd style="margin-left:auto">?</kbd></button>
+        </div></details>
+    </header>
+
+    <main id="main" class="content" tabindex="-1">
+      <div class="alert info" style="margin-bottom:14px"><i data-ic="alert" data-s="18"></i><div>Halaman statis ini memuat <code>assets/css/app.css</code> dan JS inti tanpa PHP. Coba: <kbd>Ctrl</kbd> <kbd>K</kbd> palet perintah, <kbd>?</kbd> daftar pintasan, <kbd>g</kbd> lalu <kbd>u</kbd> pindah halaman, tombol sidebar untuk mode ikon, menu avatar untuk tema / aksen / kepadatan. Semua pilihan disimpan di <code>localStorage</code>.</div></div>
+
+      <div class="page-head"><div><h1 class="page-title">Dasbor</h1><p class="page-desc">Kesehatan router, aktivitas hotspot, dan pendapatan sekilas.</p></div>
+        <div class="page-actions"><button class="btn" type="button"><i data-ic="refresh" data-s="16"></i>Muat ulang</button><button class="btn btn-primary" type="button"><i data-ic="plus" data-s="16"></i>Tambah user</button></div></div>
+
+      <h2 class="pv-h" id="dash">Dasbor bento: kartu statistik (count-up + sparkline), area chart, gauge, donat, heatmap</h2>
+      <div class="bento">
+        <section class="card glass stat-card lift col-3"><div class="card-b">
+          <div class="stat-label"><span class="stat-ic"><i data-ic="activity" data-s="14"></i></span>Sesi aktif<span class="delta up"><span class="live-dot" style="width:6px;height:6px"></span><span class="hide-m">Langsung</span></span></div>
+          <div class="stat-value" data-count="24">0</div><div class="stat-sub">312 total user</div>
+          <div class="stat-spark"><canvas id="sp-active"></canvas></div></div></section>
+        <section class="card glass stat-card lift col-3"><div class="card-b">
+          <div class="stat-label"><span class="stat-ic"><i data-ic="chart" data-s="14"></i></span>Pendapatan hari ini<span class="delta up">+12%</span></div>
+          <div class="stat-value" data-count="185000" data-money>Rp 0</div><div class="stat-sub">37 voucher terjual</div>
+          <div class="stat-spark"><canvas id="sp-today"></canvas></div></div></section>
+        <section class="card glass stat-card lift col-3"><div class="card-b">
+          <div class="stat-label"><span class="stat-ic"><i data-ic="chart" data-s="14"></i></span>Pendapatan bulan ini<span class="delta down">-4%</span></div>
+          <div class="stat-value" data-count="4210000" data-money>Rp 0</div><div class="stat-sub">812 voucher terjual</div>
+          <div class="stat-spark"><canvas id="sp-count"></canvas></div></div></section>
+        <section class="card glass stat-card lift col-3"><div class="card-b">
+          <div class="stat-label"><span class="stat-ic"><i data-ic="layers" data-s="14"></i></span>14 hari terakhir</div>
+          <div class="stat-value" data-count="2910000" data-money>Rp 0</div><div class="stat-sub">19/10 - 01/11</div>
+          <div class="stat-spark"><canvas id="spark"></canvas></div></div></section>
+
+        <section class="card glass col-8" id="charts"><div class="card-h"><h2>Trafik langsung (arahkan kursor: crosshair + tooltip)</h2>
+          <div class="row tr-head" style="gap:16px"><span><span class="muted">RX</span> <b class="mono" id="rx" style="color:var(--chart-1)">-</b></span><span><span class="muted">TX</span> <b class="mono" id="tx" style="color:var(--chart-3)">-</b></span><select class="select select-sm" style="width:auto" aria-label="Interface"><option>ether1</option><option>wlan1</option></select></div></div>
+          <div class="card-b" style="padding-top:6px"><div class="chart-box lg"><canvas id="traffic"></canvas></div><div class="legend"><span><i style="background:var(--chart-1)"></i>RX</span><span><i style="background:var(--chart-3)"></i>TX</span></div></div></section>
+        <section class="card glass col-4"><div class="card-h"><h2>Resource sistem (gauge radial)</h2></div><div class="card-b">
+          <div class="gauges">
+            <div class="gauge"><div data-g="cpu"></div><div class="gauge-l">CPU</div><div class="gauge-s">23%</div></div>
+            <div class="gauge"><div data-g="mem"></div><div class="gauge-l">RAM</div><div class="gauge-s">199 MB / 256 MB</div></div>
+            <div class="gauge"><div data-g="disk"></div><div class="gauge-l">Disk</div><div class="gauge-s">15 MB / 16 MB</div></div>
+          </div>
+          <dl class="kv" style="margin-top:14px"><dt>Identitas</dt><dd>MikroTik-Demo</dd><dt>Board</dt><dd>RB750Gr3</dd><dt>RouterOS</dt><dd>6.49.13</dd><dt>Uptime</dt><dd>12d5h8m</dd></dl>
+        </div></section>
+        <section class="card glass col-4"><div class="card-h"><h2>User per profil (donat interaktif)</h2></div><div class="card-b">
+          <div class="chart-box" style="height:168px"><canvas id="pie2"></canvas></div><div class="legend-list" id="pie2-legend"></div></div></section>
+        <section class="card glass col-8"><div class="card-h"><h2>Peta panas penjualan</h2><span class="muted" style="font-size:12px">Puncak: Jum 14:00 (7)</span></div><div class="card-b">
+          <div id="heat"></div><div class="heat-scale">Sedikit <i data-l="0"></i><i data-l="1"></i><i data-l="2"></i><i data-l="3"></i><i data-l="4"></i> Banyak</div>
+          <div class="ins-row"><div><span>Penjualan</span><b>263</b></div><div><span>Jam puncak</span><b>14:00-15:00</b></div><div><span>Hari tersibuk</span><b>Sab</b></div></div></div></section>
+        <section class="card glass col-8"><div class="card-h"><h2>Pendapatan per hari (bar, hover menyorot)</h2></div><div class="card-b"><div class="chart-box"><canvas id="bars"></canvas></div></div></section>
+        <section class="card glass col-4"><div class="card-h"><h2>Per profil (donat, legenda ringkas)</h2></div><div class="card-b"><div class="chart-box" style="height:168px"><canvas id="pie"></canvas></div><div class="legend" id="pie-legend"></div></div></section>
+      </div>
+
+      <h2 class="pv-h" id="tbl">Tabel padat: sticky header, hover aksi baris, urut, chip filter, toggle kolom, bar aksi massal melayang</h2>
+      <section class="card glass">
+        <form onsubmit="return false" data-bulk>
+          <div class="tbl-tools"><input class="input search" type="search" placeholder="Cari nama atau komentar" data-filter="#demo-tbl" aria-label="Cari"><select class="select" aria-label="Profil"><option>Semua profil</option><option>1Jam</option></select><span class="spacer"></span><button class="btn btn-sm btn-ghost hide-m" type="button" data-density>Kepadatan</button></div>
+          <div class="sel-bar" data-sel-bar hidden><span data-sel-count></span><span class="spacer"></span><button class="btn btn-sm" type="button"><i data-ic="ban" data-s="16"></i>Nonaktifkan</button><button class="btn btn-sm btn-danger" type="button" data-confirm="Hapus user terpilih? Tindakan ini tidak bisa dibatalkan."><i data-ic="trash" data-s="16"></i>Hapus</button></div>
+          <div class="table-wrap"><table class="tbl resp" id="demo-tbl">
+            <thead><tr><th class="cell-chk"><input type="checkbox" data-check-all aria-label="Pilih semua"></th><th data-sort>User</th><th data-sort data-chip>Profil</th><th data-chip>Status</th><th data-sort>Lama aktif</th><th class="num">Data masuk / keluar</th><th>Komentar</th><th></th></tr></thead>
+            <tbody>
+              <tr><td class="cell-chk" data-label=""><input type="checkbox" name="ids[]" value="1" aria-label="k7m2xq"></td><td data-label="User"><span class="mono"><b>k7m2xq</b></span></td><td data-label="Profil">1Hari</td><td data-label="Status"><span class="badge badge-ok">Online</span></td><td data-label="Lama aktif" class="mono">1h12m</td><td data-label="Data" class="num mono">312,4 MB / 18,2 MB</td><td data-label="Komentar" class="muted">vc-580-batchA</td><td class="actions" data-label=""><button class="btn btn-sm btn-ghost btn-icon" type="button" aria-label="Ubah"><i data-ic="edit" data-s="16"></i></button></td></tr>
+              <tr><td class="cell-chk" data-label=""><input type="checkbox" name="ids[]" value="2" aria-label="p9dzw4"></td><td data-label="User"><span class="mono"><b>p9dzw4</b></span></td><td data-label="Profil">3Jam</td><td data-label="Status"><span class="badge badge-info">Terpakai</span></td><td data-label="Lama aktif" class="mono">2h40m</td><td data-label="Data" class="num mono">1,02 GB / 40,5 MB</td><td data-label="Komentar" class="muted">vc-580-batchA</td><td class="actions" data-label=""><button class="btn btn-sm btn-ghost btn-icon" type="button" aria-label="Ubah"><i data-ic="edit" data-s="16"></i></button></td></tr>
+              <tr><td class="cell-chk" data-label=""><input type="checkbox" name="ids[]" value="3" aria-label="h3tn8c"></td><td data-label="User"><span class="mono"><b>h3tn8c</b></span></td><td data-label="Profil">7Hari</td><td data-label="Status"><span class="badge badge-neutral">Belum dipakai</span></td><td data-label="Lama aktif" class="mono">0s</td><td data-label="Data" class="num mono">0 B / 0 B</td><td data-label="Komentar" class="muted">up-423-batchB</td><td class="actions" data-label=""><button class="btn btn-sm btn-ghost btn-icon" type="button" aria-label="Ubah"><i data-ic="edit" data-s="16"></i></button></td></tr>
+              <tr><td class="cell-chk" data-label=""><input type="checkbox" name="ids[]" value="4" aria-label="w5rb2e"></td><td data-label="User"><span class="mono"><b>w5rb2e</b></span></td><td data-label="Profil">1Jam</td><td data-label="Status"><span class="badge badge-warn">Kedaluwarsa</span></td><td data-label="Lama aktif" class="mono">1h</td><td data-label="Data" class="num mono">88,0 MB / 4,1 MB</td><td data-label="Komentar" class="muted">up-423-batchB</td><td class="actions" data-label=""><button class="btn btn-sm btn-ghost btn-icon" type="button" aria-label="Ubah"><i data-ic="edit" data-s="16"></i></button></td></tr>
+              <tr><td class="cell-chk" data-label=""><input type="checkbox" name="ids[]" value="5" aria-label="z8qf6a"></td><td data-label="User"><span class="mono"><b>z8qf6a</b></span></td><td data-label="Profil">30Hari</td><td data-label="Status"><span class="badge badge-err">Nonaktif</span></td><td data-label="Lama aktif" class="mono">3d4h</td><td data-label="Data" class="num mono">9,3 GB / 311,0 MB</td><td data-label="Komentar" class="muted">vc-739-batchA</td><td class="actions" data-label=""><button class="btn btn-sm btn-ghost btn-icon" type="button" aria-label="Ubah"><i data-ic="edit" data-s="16"></i></button></td></tr>
+              <tr><td class="cell-chk" data-label=""><input type="checkbox" name="ids[]" value="6" aria-label="m4cv7s"></td><td data-label="User"><span class="mono"><b>m4cv7s</b></span></td><td data-label="Profil">1Hari</td><td data-label="Status"><span class="badge badge-ok">Online</span></td><td data-label="Lama aktif" class="mono">0h25m</td><td data-label="Data" class="num mono">54,1 MB / 6,0 MB</td><td data-label="Komentar" class="muted">vc-580-batchA</td><td class="actions" data-label=""><button class="btn btn-sm btn-ghost btn-icon" type="button" aria-label="Ubah"><i data-ic="edit" data-s="16"></i></button></td></tr>
+            </tbody></table></div>
+          <div class="pager"><span>Halaman 1 dari 3 &middot; 6 baris</span><div class="row"><a class="btn btn-sm" aria-disabled="true" tabindex="-1" href="#">&lsaquo; Sebelum</a><a class="btn btn-sm" href="#">Berikut &rsaquo;</a></div></div>
+        </form>
+      </section>
+
+      <h2 class="pv-h" id="forms">Komponen dasar</h2>
+      <div class="grid">
+        <section class="card glass col-6"><div class="card-h"><h2>Tombol, lencana</h2></div><div class="card-b stack">
+          <div class="row"><button class="btn btn-primary">Primary</button><button class="btn">Secondary</button><button class="btn btn-ghost">Ghost</button><button class="btn btn-danger">Danger</button></div>
+          <div class="row"><button class="btn btn-primary btn-sm">Kecil</button><button class="btn btn-primary">Sedang</button><button class="btn btn-primary btn-lg">Besar</button></div>
+          <div class="row"><button class="btn btn-primary" disabled>Disabled</button><button class="btn btn-primary" type="button" id="ld">Loading</button><button class="btn btn-icon" aria-label="Tambah"><i data-ic="plus"></i></button><button class="btn" data-tip="Tooltip">Hover saya</button></div>
+          <div class="row"><span class="badge badge-ok">Sukses</span><span class="badge badge-warn">Peringatan</span><span class="badge badge-err">Galat</span><span class="badge badge-info">Info</span><span class="badge">Netral</span><span class="delta up">+12%</span><span class="delta down">-4%</span></div>
+          <div class="chips"><button type="button" class="chip" aria-pressed="true">Semua <small>42</small></button><button type="button" class="chip" aria-pressed="false">Online <small>9</small></button><button type="button" class="chip" aria-pressed="false">Kedaluwarsa <small>5</small></button></div>
+        </div></section>
+        <section class="card glass col-6"><div class="card-h"><h2>Formulir</h2></div><div class="card-b stack">
+          <div class="field"><label for="f1">Username</label><input class="input" id="f1" value="k7m2xq"><p class="help">Teks bantuan singkat.</p></div>
+          <div class="field"><label for="f2">Batas waktu</label><input class="input" id="f2" value="2x" aria-invalid="true"><p class="error">Format tidak valid (contoh: 1h30m).</p></div>
+          <div class="field"><label for="f3">Profil</label><select class="select" id="f3"><option>1Jam</option><option>3Jam</option></select></div>
+          <div class="row"><label class="switch"><input type="checkbox" checked><span class="track"></span><span>Aktif</span></label><label class="check"><input type="checkbox">Kunci MAC</label>
+            <div class="seg" role="group"><button type="button" aria-pressed="true">Hari</button><button type="button" aria-pressed="false">Bulan</button><button type="button" aria-pressed="false">Tahun</button></div></div>
+        </div></section>
+      </div>
+
+      <h2 class="pv-h" id="feedback">Umpan balik: toast bertumpuk, skeleton, kosong, alert</h2>
+      <div class="grid">
+        <section class="card glass col-6"><div class="card-h"><h2>Toast (progres = sisa waktu, jeda saat hover)</h2></div><div class="card-b stack">
+          <div class="row"><button class="btn" type="button" id="toast-ok">Sukses</button><button class="btn" type="button" id="toast-info">Info</button><button class="btn" type="button" id="toast-warn">Peringatan</button><button class="btn" type="button" id="toast-err">Galat</button></div>
+          <div class="row"><button class="btn" type="button" data-open="#dlg-demo">Buka modal</button><button class="btn btn-danger" type="button" data-confirm="Hapus router demo? Kredensial tersimpan ikut dihapus.">Konfirmasi hapus</button><button class="btn" type="button" id="open-pal">Palet perintah</button><button class="btn" type="button" id="open-help">Pintasan</button></div>
+          <div class="tabs" role="tablist"><button role="tab" aria-selected="true" aria-controls="p-a" id="t-a" data-tab="a">Umum</button><button role="tab" aria-selected="false" aria-controls="p-b" id="t-b" data-tab="b">Akun</button></div>
+          <div class="tabpanel" role="tabpanel" id="p-a" aria-labelledby="t-a"><p class="muted">Panel tab pertama.</p></div><div class="tabpanel" role="tabpanel" id="p-b" aria-labelledby="t-b" hidden><p class="muted">Panel tab kedua.</p></div>
+        </div></section>
+        <section class="card glass col-6"><div class="card-h"><h2>Skeleton, kosong, alert</h2></div><div class="card-b stack">
+          <div><div class="skeleton line" style="width:40%"></div><div class="skeleton line"></div><div class="skeleton line" style="width:75%"></div></div>
+          <div class="row"><div class="skeleton circle" style="width:56px;height:56px"></div><div class="skeleton block" style="flex:1;height:56px"></div></div>
+          <div class="empty" style="padding:20px"><i data-ic="users" data-s="24"></i><h3>User tidak ditemukan</h3><p>Coba filter lain, atau buat batch voucher.</p><a class="btn btn-primary btn-sm" href="#">Buat voucher</a></div>
+          <div class="alert err"><i data-ic="alert" data-s="18"></i><div>Router tidak terjangkau: Cannot connect to 192.168.88.1:8728.</div></div>
+        </div></section>
+      </div>
+
+      <h2 class="pv-h" id="overlay">Voucher (kartu cetak tetap datar), QR tanpa CDN</h2>
+      <section class="card glass"><div class="card-b">
+        <div class="vgrid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">
+          <div class="v-card"><div><h4>NextMON WiFi</h4><div style="font-size:10px;color:#555">Voucher</div><div class="v-code">k7m2xq</div><div class="v-meta">1Hari &middot; Rp 5.000 &middot; 1d</div></div><span class="qr" data-qr="http://hotspot.local/login?username=k7m2xq&password=k7m2xq"></span></div>
+          <div class="v-card"><div><h4>NextMON WiFi</h4><div style="font-size:10px;color:#555">User</div><div class="v-code">ab12cd</div><div style="font-size:10px;color:#555">Pass</div><div class="v-code">z9y8x7</div><div class="v-meta">3Jam &middot; Rp 4.000</div></div><span class="qr" data-qr="http://hotspot.local/login?username=ab12cd&password=z9y8x7"></span></div>
+        </div></div></section>
+    </main>
+  </div>
+</div>
+
+<nav class="tabbar glass" aria-label="Navigasi cepat">
+  <a class="tab" href="#dash" aria-current="page"><i data-ic="home" data-s="22"></i><span>Dasbor</span></a>
+  <a class="tab" href="#tbl"><i data-ic="users" data-s="22"></i><span>User</span></a>
+  <a class="tab" href="#forms"><i data-ic="ticket" data-s="22"></i><span>Voucher</span></a>
+  <a class="tab" href="#charts"><i data-ic="chart" data-s="22"></i><span>Laporan</span></a>
+  <button class="tab" type="button" data-drawer-open><i data-ic="menu" data-s="22"></i><span>Menu</span></button>
+</nav>
+<div class="drawer" id="drawer" aria-hidden="true"><div class="drawer-bg" data-drawer-close></div>
+  <div class="drawer-panel glass" role="dialog" aria-modal="true" aria-label="Menu">
+    <div class="row" style="justify-content:space-between"><a class="brand" href="#"><span class="brand-mark"><svg class="brand-glyph" width="18" height="18" viewBox="7 6 50 50" aria-hidden="true"><g transform="translate(-4 3)" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 46V20l22 26V26" stroke-width="5.6"/><path d="M41.4 18.1A8 8 0 0 1 47.9 24.6" stroke-width="4.4"/><path d="M42.6 11.2A15 15 0 0 1 54.8 23.4" stroke-width="4.4" stroke-opacity="0.8"/></g></svg></span><span>NextMON</span></a><button class="btn btn-ghost btn-icon" type="button" data-drawer-close aria-label="Tutup"><i data-ic="x"></i></button></div>
+    <nav><div class="nav-title">Hotspot</div><a class="nav-link" href="#tbl"><i data-ic="users" data-s="18"></i><span class="nav-label">User hotspot</span></a><a class="nav-link" href="#forms"><i data-ic="ticket" data-s="18"></i><span class="nav-label">Voucher</span></a><a class="nav-link" href="#overlay"><i data-ic="settings" data-s="18"></i><span class="nav-label">Pengaturan</span></a></nav>
+  </div></div>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<dialog class="modal palette glass" id="palette" aria-label="Palet perintah"><input class="pal-input" id="pal-input" type="text" placeholder="Ketik perintah atau nama halaman..." autocomplete="off"><ul class="pal-list" id="pal-list" role="listbox"></ul></dialog>
+<dialog class="modal" id="confirm-dlg"><div class="modal-h"><h2 id="confirm-title">Mohon konfirmasi</h2></div><div class="modal-b"><p id="confirm-msg"></p></div><div class="modal-f"><button class="btn" type="button" data-confirm-no>Batal</button><button class="btn btn-danger" type="button" data-confirm-yes>Konfirmasi</button></div></dialog>
+<dialog class="modal" id="dlg-demo"><form onsubmit="return false"><div class="modal-h"><h2>User hotspot</h2><button type="button" class="btn btn-ghost btn-icon" data-close aria-label="Tutup"><i data-ic="x"></i></button></div>
+  <div class="modal-b"><div class="form-grid"><div class="field"><label for="m1">Username</label><input class="input mono" id="m1"></div><div class="field"><label for="m2">Password</label><input class="input mono" id="m2"></div><div class="field full"><label for="m3">Komentar</label><input class="input" id="m3"></div></div></div>
+  <div class="modal-f"><button type="button" class="btn" data-close>Batal</button><button class="btn btn-primary">Simpan</button></div></form></dialog>
+<style>.pv-h { margin: 28px 0 10px; font-size: 14px; letter-spacing: -.005em; color: var(--text-2); } .pv-h:first-of-type { margin-top: 18px; }</style>
+<script type="application/json" id="i18n">{"selected":":n dipilih","noresult":"Tidak ada hasil","pages":"Halaman","actions":"Aksi","theme":"Tema","nodata":"Tidak ada data","copied":"Tersalin","confirm":"Yakin?","offline":"Anda sedang offline","close":"Tutup","rows":"baris","all":"Semua","columns":"Kolom","shortcuts":"Pintasan keyboard","general":"Umum","navigate":"Navigasi","select":"Pilih","Appearance":"Tampilan","Recent":"Terbaru","Accent":"Aksen","Density":"Kepadatan","Compact":"Ringkas","Comfortable":"Lega","Account":"Akun","This page":"Halaman ini","Show shortcuts":"Tampilkan pintasan","Toggle sidebar":"Ciutkan/bentangkan sidebar","Focus search":"Fokus ke pencarian","Command palette":"Palet perintah","Go to":"Pergi ke","Select range":"Pilih rentang","Refresh data":"Muat ulang data","Close":"Tutup"}</script>
+<script src="../assets/js/app.js" defer></script>
+<script src="../assets/js/charts.js" defer></script>
+<script src="../assets/js/qr.js" defer></script>
+<script src="preview.js" defer></script>
+</body>
+</html>
