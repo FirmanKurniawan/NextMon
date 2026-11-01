@@ -22,6 +22,8 @@ export async function registerNode(): Promise<void> {
       return orig.call(this, ev, ...args);
     };
   }
+  // in-process scheduler (monitor poll / stock / backup jobs of every active workspace); NEXTMON_SCHEDULER=0 disables it
+  void import('./features/scheduler/run.ts').then((m) => m.startScheduler()).catch((e) => console.error('[nextmon] scheduler not started', e));
   const closeAll = async () => {
     try {
       const { routerPool } = await import('./lib/routeros.ts');

@@ -113,7 +113,7 @@ export const Routers = {
       'routers',
       (list) => {
         const i = id ? list.findIndex((r) => r.id === id) : -1;
-        if (i < 0 && list.length >= limit) throw new RouterError('Router limit reached for this workspace.');
+        if (i < 0 && limit > 0 && list.length >= limit) throw new RouterError('Router limit reached for this workspace.');
         const prev = i >= 0 ? list[i]! : null;
         saved = {
           id: prev?.id ?? randomHex(4),

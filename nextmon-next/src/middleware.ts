@@ -19,11 +19,11 @@ export const config = {
 };
 
 const PUBLIC_EXACT = new Set(['/login', '/setup', '/lang', '/manifest.webmanifest', '/sw.js', '/offline.html', '/offline', '/api/health', '/robots.txt']);
-const PUBLIC_PREFIX = ['/assets/', '/p/', '/api/public/'];
+const PUBLIC_PREFIX = ['/assets/', '/p/', '/api/public/', '/api/v1/']; // /api/v1/: API-key clients (no session cookie; the key is checked in lib/api-v1.ts)
 // public pages of feature modules that the PHP edition exposes without login (shop, voucher status, payment callbacks)
-const PUBLIC_FEATURE_PREFIX = ['/shop', '/status', '/pay/'];
+const PUBLIC_FEATURE_EXACT = new Set(['/shop', '/shop/order', '/shop/poll', '/status', '/status.json', '/pay/callback', '/pay/mock']);
 
-const isPublic = (p: string) => PUBLIC_EXACT.has(p) || PUBLIC_PREFIX.some((x) => p.startsWith(x)) || PUBLIC_FEATURE_PREFIX.some((x) => p === x.replace(/\/$/, '') || p.startsWith(x));
+const isPublic = (p: string) => PUBLIC_EXACT.has(p) || PUBLIC_PREFIX.some((x) => p.startsWith(x)) || PUBLIC_FEATURE_EXACT.has(p);
 
 const deny = (status: number, msg: string) => new NextResponse(msg, { status, headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store' } });
 

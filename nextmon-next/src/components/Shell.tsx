@@ -113,7 +113,7 @@ export default function Shell({ ctx, page, title, scripts, nonce, back, children
                 <label className="sr-only" htmlFor="ws-sel">
                   {t('Workspace')}
                 </label>
-                <select id="ws-sel" name="workspace" className="select select-sm" data-autosubmit defaultValue={ctx.workspace.id} style={{ maxWidth: 170 }}>
+                <select key={ctx.workspace.id} id="ws-sel" name="workspace" className="select select-sm" data-autosubmit defaultValue={ctx.workspace.id} style={{ maxWidth: 170 }}>
                   {workspaces.map((w) => (
                     <option key={w.id} value={w.id}>
                       {w.name}
@@ -133,7 +133,7 @@ export default function Shell({ ctx, page, title, scripts, nonce, back, children
                 <label className="sr-only" htmlFor="router-sel">
                   {t('Router')}
                 </label>
-                <select id="router-sel" name="router" className="select select-sm" data-autosubmit defaultValue={ctx.router?.id} style={{ maxWidth: 170 }}>
+                <select key={ctx.router?.id ?? 'none'} id="router-sel" name="router" className="select select-sm" data-autosubmit defaultValue={ctx.router?.id} style={{ maxWidth: 170 }}>
                   {rs.map((r) => (
                     <option key={r.id} value={r.id}>
                       {r.name}

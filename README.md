@@ -10,7 +10,7 @@ Pesaing [Mikhmon](https://laksa19.github.io/) dengan UI glassmorphism/neumorphis
 | Folder | Isi |
 |---|---|
 | [`nextmon-php/`](nextmon-php/) | Versi PHP + JS + HTML + CSS, ala Mikhmon (XAMPP / hosting / Docker) |
-| [`nextmon-next/`](nextmon-next/) | Versi Next.js fullstack (TypeScript) — fondasi multi-akun, UI fitur menyusul |
+| [`nextmon-next/`](nextmon-next/) | Versi Next.js fullstack (TypeScript), multi-akun, fitur utama setara edisi PHP |
 | [`shared/`](shared/) | Template login hotspot glass & template voucher cetak |
 | [`docs/`](docs/) | PLAN, FEATURES (gap analysis), ARCHITECTURE, skrip RouterOS |
 
@@ -34,6 +34,6 @@ Kedua versi punya **mode demo** (data palsu) sehingga bisa dicoba tanpa router.
 [PLAN](docs/PLAN.md) · [FEATURES](docs/FEATURES.md) · [ARCHITECTURE](docs/ARCHITECTURE.md) · [AGENTS](AGENTS.md) · [MEMORY](MEMORY.md) · [CHANGELOG](CHANGELOG.md)
 
 ## Status
-**Rilis v0.1.0.** Edisi PHP lengkap dan teruji (tes unit, smoke, keamanan, isolasi multi-akun). Edisi Next.js sedang dilengkapi agar setara fitur dengan PHP. Catatan jujur: pengujian pada router MikroTik asli masih terbatas (koneksi dan dasbor sudah dicoba; skrip on-login/expiry, payment gateway live, dan cetak kertas belum). Lihat `release/RELEASE_NOTES.md` dan README tiap folder untuk detail.
+**Rilis v0.1.0.** Edisi PHP lengkap dan teruji (tes unit, smoke, keamanan, isolasi multi-akun). Edisi Next.js memiliki semua halaman utama edisi PHP (diuji dalam mode demo: 240 tes, build produksi, 30+ halaman dimuat tanpa error); belum diuji dengan router asli dan beberapa fitur kecil belum dipindahkan (lihat `nextmon-next/README.md`). Catatan jujur: pengujian pada router MikroTik asli masih terbatas (koneksi dan dasbor sudah dicoba; skrip on-login/expiry, payment gateway live, dan cetak kertas belum). Lihat `release/RELEASE_NOTES.md` dan README tiap folder untuk detail.
 
 Proyek independen, tidak berafiliasi dengan Mikhmon/Laksa19 maupun MikroTik. Kode ditulis dari nol berdasarkan dokumentasi RouterOS.

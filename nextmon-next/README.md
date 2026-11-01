@@ -67,4 +67,7 @@ npm run cli -- doctor
 
 ## Batasan saat ini
 
-Belum ada UI untuk: CRUD Router, akun platform/workspace, staff, berbagi router, voucher/penjualan/toko/pembayaran. Pustaka (`src/lib`) sudah siap; halaman dibangun sebagai fitur terpisah.
+Halaman yang ada (setara edisi PHP): dasbor, user/profil/aktif/host/binding/walled garden, voucher (cetak, QR, template, impor CSV), POS, laporan, reseller + dompet, PPPoE/DHCP/ARP/queue/firewall, traffic live (SSE), monitor, tools, backup, penjadwal + endpoint cron, router + berbagi ro/rw, akun platform, wizard, onboarding, pengaturan/keamanan/audit/notifikasi/API key, toko publik + pembayaran + pesanan + halaman status.
+
+Teruji: typecheck, lint (0 error), 240 tes vitest, build produksi, 30+ halaman dimuat di build standalone mode demo. **Belum:** router MikroTik asli, gateway pembayaran live (hanya verifikasi webhook yang diuji), cetak kertas, Linux/macOS.
+Belum dipindahkan: penjualan reseller lewat alur toko, tombol "reset counters" massal (di PHP juga hanya backend), batas voucher/hari dan ukuran log, restore data aplikasi dari UI, beberapa tampilan (mode terang/375 px) hanya diperiksa sebagian.

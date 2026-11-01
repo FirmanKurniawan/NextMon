@@ -16,3 +16,4 @@ data/
 config.local.*
 tsconfig.tsbuildinfo
 Thumbs.db
+.next-*/

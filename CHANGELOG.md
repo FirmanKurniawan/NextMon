@@ -44,7 +44,7 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/).
 - Perbaikan: `layout.php` rusak (blok skrip duplikat tanpa `$`); hitungan user per profil tidak error saat field `profile` kosong.
 
 ### Fondasi Next.js & Server (belum rilis)
-- `nextmon-next/`: fondasi multi-tenant (Store fail-closed, auth, RouterOS client, driver, SSE traffic bersama, shell UI memakai CSS PHP). 130 tes vitest lulus, build OK. UI fitur belum ada.
+- `nextmon-next/`: fondasi multi-tenant (Store fail-closed, auth, RouterOS client, driver, SSE traffic bersama, shell UI memakai CSS PHP). 130 tes vitest lulus, build OK. Kemudian dilengkapi semua modul fitur (hotspot, voucher, POS, laporan, reseller, jaringan, monitor, tools, backup, penjadwal, router/platform/wizard, pengaturan, toko/pesanan/status): 240 tes, build produksi OK; belum diuji di router asli.
 - `nextmon-server/ui` + `tools/mock-server.mjs`: panel kontrol web (diuji dengan server tiruan; server Rust belum teruji).
 - `nextmon-php/tests/tenant_isolation_test.php`: suite isolasi antar-akun.
 - Multi-akun (PHP): workspace per pemilik, halaman platform, berbagi router ro/rw, migrasi data lama ke `main`. Suite isolasi 19 area lulus (json). Batas voucher/hari dan log belum diberlakukan.

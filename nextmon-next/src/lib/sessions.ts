@@ -10,6 +10,7 @@ import { db } from './db.ts';
 import type { Row } from './db.ts';
 import { Env } from './env.ts';
 import { randomHex, randomToken, sha256 } from './crypto.ts';
+import { Security } from './security.ts';
 import { Users } from './users.ts';
 import type { User } from './users.ts';
 import { Workspace } from './workspace.ts';
@@ -53,7 +54,7 @@ export const Sessions = {
     if (!row) return null;
     const s = toRec(row);
     const t = now();
-    const idle = Env.sessionIdleMinutes() * 60;
+    const idle = Security.idleSeconds(s.ws); // per-workspace policy (Settings > Security); default NEXTMON_SESSION_IDLE_MIN
     if (t - s.created > ABSOLUTE_MAX_SECONDS || (idle > 0 && t - s.last > idle)) {
       Sessions.destroyHash(hash);
       return null;

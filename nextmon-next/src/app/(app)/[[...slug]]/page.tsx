@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { Icon } from '../../../components/Icon';
 import { Features } from '../../../features/registry.ts';
+import Onboarding from '../../../features/routers/Onboarding';
 import { requireContext } from '../../../server/guard.ts';
 
 export const dynamic = 'force-dynamic';
@@ -23,6 +24,8 @@ export default async function FeaturePageRoute({ params, searchParams }: { param
       </div>
     );
   }
+  // first-run state: an account without any router gets "Add router" / "Try demo mode" instead of an empty dashboard
+  if (!ctx.router && m.page.path === '/') return <Onboarding ctx={ctx} addHref="/routers" />;
   const mod = await m.page.component();
   const props = { ctx, params: m.params, searchParams: await searchParams };
   // The component runs inside the workspace context. (Async child components rendered later must call ctx.run themselves.)

@@ -2,6 +2,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
+  // dev only: parallel dev servers can use separate build dirs (NM_DIST_DIR=.next-dev-a); production keeps .next
+  ...(process.env.NM_DIST_DIR && process.env.NODE_ENV !== 'production' ? { distDir: process.env.NM_DIST_DIR } : {}),
   poweredByHeader: false,
   reactStrictMode: true,
   // node:sqlite is a Node builtin; keep server-only libs out of the client graph
