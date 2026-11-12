@@ -75,7 +75,10 @@ export async function runApi(opts: { cap?: Cap }, req: Request, rest: string[], 
     return json(out, out.ok === false ? 400 : 200);
   } catch (e) {
     if (e instanceof HttpError) return json({ ok: false, error: e.message }, e.status);
-    if (e instanceof RouterOSError) return json({ ok: false, error: e.message }, 502);
+    if (e instanceof RouterOSError) {
+      console.warn('[nextmon] routeros 502', req.url, e.message);
+      return json({ ok: false, error: e.message }, 502);
+    }
     if (e instanceof RouterError) return json({ ok: false, error: e.message }, 404);
     if (e instanceof NoWorkspaceError) return json({ ok: false, error: 'no workspace' }, 403);
     console.error('[nextmon] api error', e);

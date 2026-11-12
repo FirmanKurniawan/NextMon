@@ -3,6 +3,7 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 ### Added
+- `nextmon-next/`: Docker deployment (`Dockerfile`, `.dockerignore`, `docker-compose.yml` memakai `node:24-alpine`, `network_mode: host`, healthcheck HTTP dengan header `Host`, volume data `/data`, dan mount `../shared/hotspot-login`). Terpasang & terverifikasi di `mikhmon-xeon` (`192.168.1.14:3000`) di balik Caddy Nebula `https://nextmon.tunnelizer.com`.
 - Riset Mikhmon v3/v4 dan rencana proyek (`docs/PLAN.md`), `AGENTS.md`, `MEMORY.md`, README, LICENSE.
 - `docs/FEATURES.md`, `docs/ARCHITECTURE.md`, `docs/mikrotik-scripts/` (skrip `.rsc` belum diverifikasi di router).
 - `shared/hotspot-login/` — template login hotspot (CHAP md5, voucher satu kolom, QR scan) dan `shared/voucher-templates/` (A4 grid, glass card, thermal 58/80, generator QR). Teruji di node + Chrome headless, belum di router.

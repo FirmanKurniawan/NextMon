@@ -36,7 +36,7 @@ export function securityHeaders(https: boolean): Record<string, string> {
     'x-content-type-options': 'nosniff',
     'x-frame-options': 'DENY',
     'referrer-policy': 'strict-origin-when-cross-origin',
-    'permissions-policy': 'camera=(self), microphone=(), geolocation=(), payment=(), usb=(), bluetooth=(self), interest-cohort=()',
+    'permissions-policy': 'camera=(self), microphone=(), geolocation=(), payment=(), usb=(), bluetooth=(self)',
     'cross-origin-opener-policy': 'same-origin',
     'cross-origin-resource-policy': 'same-origin',
     'x-dns-prefetch-control': 'off',

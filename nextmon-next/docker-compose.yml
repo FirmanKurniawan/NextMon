@@ -1,0 +1,29 @@
+name: nextmon
+
+services:
+  app:
+    build:
+      context: .
+    image: nextmon-next:latest
+    restart: unless-stopped
+    network_mode: host
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: ${PORT:-3000}
+      HOSTNAME: 0.0.0.0
+      NEXTMON_DATA: /data
+    volumes:
+      - nextmon_data:/data
+      - ../shared/hotspot-login:/app/shared/hotspot-login:ro
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+volumes:
+  nextmon_data:
