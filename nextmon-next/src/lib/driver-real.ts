@@ -19,9 +19,15 @@ export class RealDriver extends BaseDriver {
     return { path: normPath(path) + '/print', query, props: props.length ? props : undefined };
   }
 
+  private printTimeout(path: string): number | undefined {
+    const p = normPath(path);
+    return /^\/(system\/script|ip\/hotspot\/user|log)$/.test(p) ? 60000 : undefined;
+  }
+
   async print(path: string, query: Attrs = {}, props: string[] = []): Promise<Row[]> {
     const cmd = this.printCmd(path, query, props);
-    return (await this.link.use((c) => c.send(cmd), true)).rows;
+    const timeoutMs = this.printTimeout(path);
+    return (await this.link.use((c) => c.send(cmd, timeoutMs ? { timeoutMs } : undefined), true)).rows;
   }
 
   override async printMany(reqs: Record<string, PrintReq>): Promise<Record<string, Row[]>> {
@@ -31,7 +37,8 @@ export class RealDriver extends BaseDriver {
       return { [keys[0]!]: await this.print(q[0], q[1], q[2]) };
     }
     const cmds = keys.map((k) => this.printCmd(reqs[k]![0], reqs[k]![1], reqs[k]![2]));
-    const res = await this.link.use((c) => c.sendMany(cmds), true);
+    const timeoutMs = keys.some((k) => this.printTimeout(reqs[k]![0])) ? 60000 : undefined;
+    const res = await this.link.use((c) => c.sendMany(cmds, timeoutMs ? { timeoutMs } : undefined), true);
     const out: Record<string, Row[]> = {};
     for (let i = 0; i < keys.length; i++) {
       const r = res[i]!;

@@ -171,6 +171,20 @@ export async function startFake(o: FakeOpts = {}): Promise<Fake> {
           for (let i = 0; i < Number(a.n ?? 10); i++) send(['!re', `=i=${i}`], tag);
           return send(['!done'], tag);
         }
+        case '/trickle': {
+          const n = Number(a.n ?? 5);
+          const ms = Number(a.ms ?? 50);
+          let i = 0;
+          const t = setInterval(() => {
+            if (i < n) send(['!re', `=i=${i++}`], tag);
+            else {
+              clearInterval(t);
+              send(['!done'], tag);
+            }
+          }, ms);
+          streams.set(`${id}:${tag}`, t);
+          return;
+        }
         case '/interface/monitor-traffic': {
           streamStarts++;
           let n = 0;

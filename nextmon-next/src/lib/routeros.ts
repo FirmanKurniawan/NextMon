@@ -229,6 +229,7 @@ type Pending = {
   rows: Row[];
   traps: { message: string; category?: string }[];
   bytes: number;
+  lastRx: number;
   resolve(r: Reply): void;
   reject(e: Error): void;
   timer: NodeJS.Timeout | null;
@@ -260,7 +261,7 @@ export class RouterOSClient {
       verifyTls: o.verifyTls ?? false,
       user: o.user,
       password: o.password,
-      timeoutMs: o.timeoutMs ?? 8000,
+      timeoutMs: o.timeoutMs ?? 15000,
       connectTimeoutMs: o.connectTimeoutMs ?? 5000,
       watchdogMs: o.watchdogMs ?? 30000,
       keepAliveMs: o.keepAliveMs ?? 30000,
@@ -387,6 +388,7 @@ export class RouterOSClient {
     const tag = attrs['.tag'];
     const p = tag !== undefined ? this.pending.get(tag) : undefined;
     if (!p) return; // late reply of a timed-out / cancelled command: drop
+    p.lastRx = Date.now();
     if (type === '!re') {
       let n = 0;
       for (let i = 1; i < words.length; i++) n += words[i]!.length;
@@ -468,12 +470,30 @@ export class RouterOSClient {
       reject(new RouterOSError('Not connected', { connection: true }));
       return promise;
     }
-    const p: Pending = { tag, rows: [], traps: [], bytes: 0, resolve, reject, timer: null, onRow, stream, cancelled: false, settled: false };
+    const now = Date.now();
+    const p: Pending = { tag, rows: [], traps: [], bytes: 0, lastRx: now, resolve, reject, timer: null, onRow, stream, cancelled: false, settled: false };
     if (!stream && timeoutMs > 0) {
-      p.timer = setTimeout(() => {
-        this.finish(p, new RouterOSError('Router read timeout', { connection: true }));
-        void this.sendCancel(tag);
-      }, timeoutMs);
+      const hardCap = now + Math.max(timeoutMs * 6, 120_000);
+      const arm = () => {
+        const cur = Date.now();
+        const left = Math.min(timeoutMs - (cur - p.lastRx), hardCap - cur);
+        if (left <= 0) {
+          this.finish(p, new RouterOSError('Router read timeout', { connection: true }));
+          void this.sendCancel(tag);
+          return;
+        }
+        p.timer = setTimeout(() => {
+          if (p.settled) return;
+          const t = Date.now();
+          if (t - p.lastRx < timeoutMs && t < hardCap) {
+            arm();
+            return;
+          }
+          this.finish(p, new RouterOSError('Router read timeout', { connection: true }));
+          void this.sendCancel(tag);
+        }, left);
+      };
+      arm();
     }
     try {
       const words = buildWords(c, tag);
@@ -629,7 +649,7 @@ export class RouterLink {
     try {
       return await fn(c);
     } catch (e) {
-      if (retryRead && reused && e instanceof RouterOSError && e.connection && !this.breakerOpen) {
+      if (retryRead && reused && !c.connected && e instanceof RouterOSError && e.connection && !this.breakerOpen) {
         const c2 = await this.ready();
         return fn(c2);
       }

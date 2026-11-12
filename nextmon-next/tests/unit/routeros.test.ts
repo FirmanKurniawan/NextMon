@@ -179,6 +179,13 @@ describe('client against the fake RouterOS server', () => {
     expect((await c.send({ path: '/many', attrs: { n: 2 } })).rows).toHaveLength(2);
   });
 
+  it('slow multi-row reply completes beyond timeoutMs while rows keep arriving', async () => {
+    fake = await startFake();
+    const c = mk(fake.port);
+    const r = await c.send({ path: '/trickle', attrs: { n: 6, ms: 50 } }, { timeoutMs: 150 });
+    expect(r.rows).toHaveLength(6);
+  });
+
   it('!fatal rejects pending commands and the next call reconnects', async () => {
     fake = await startFake();
     const c = mk(fake.port);
