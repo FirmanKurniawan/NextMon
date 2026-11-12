@@ -20,7 +20,7 @@ export default function PlatformAccountsPage({ ctx }: PageProps) {
       <section className="card glass" style={{ marginBottom: 'var(--s4)' }}>
         <div className="card-b">
           <h2 style={{ fontSize: 'var(--fs-14)', marginBottom: 'var(--s3)' }}>{t('New account')}</h2>
-          <ActionForm action={createAccountAction} className="row" resetOnOk style={{ alignItems: 'flex-end', flexWrap: 'wrap' }}>
+          <ActionForm action={createAccountAction} className="row" resetOnOk inlineAlert style={{ alignItems: 'flex-end', flexWrap: 'wrap' }}>
             {csrf}
             <div className="field">
               <label htmlFor="pa-name">{t('Name')}</label>
