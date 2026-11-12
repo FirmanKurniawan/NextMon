@@ -1,6 +1,6 @@
 <p align="center"><img src="brand/logo.svg" alt="NextMON" height="64"></p>
 
-<p align="center"><b>NextMON</b> (aplikasi) &nbsp;·&nbsp; <a href="https://github.com/FirmanKurniawan/NextMon-Server">NextMON Server</a> (peluncur Windows .exe) &nbsp;·&nbsp; <a href="https://github.com/FirmanKurniawan/NextMon/releases">Releases</a></p>
+<p align="center"><b>NextMON</b> (aplikasi) &nbsp;·&nbsp; <a href="https://nextmon.tunnelizer.com/">Demo / Cloud Dashboard</a> &nbsp;·&nbsp; <a href="https://github.com/FirmanKurniawan/NextMon-Server">NextMON Server</a> (peluncur Windows .exe) &nbsp;·&nbsp; <a href="https://github.com/FirmanKurniawan/NextMon/releases">Releases</a></p>
 
 # NextMON — Hotspot MikroTik Manager generasi baru
 
@@ -29,6 +29,13 @@ Tangkapan layar asli dari edisi PHP dalam mode demo (data palsu, tanpa router su
 | <img src="docs/screenshots/nextmon-platform-accounts.jpg" alt="Admin platform: banyak akun dengan batas masing-masing" width="100%"><br><sub>Admin platform: banyak akun dengan batas masing-masing</sub> | <img src="docs/screenshots/nextmon-backup.jpg" alt="Backup dan pulihkan data NextMON (opsional terenkripsi)" width="100%"><br><sub>Backup dan pulihkan data NextMON (opsional terenkripsi)</sub> |
 
 <p align="center"><img src="docs/screenshots/nextmon-mobile-dashboard.jpg" alt="Dasbor di ponsel" width="280"><br><sub>Dasbor di ponsel (mobile-first, navigasi bawah)</sub></p>
+
+## Akses Dashboard Online (Gratis)
+Server cloud NextMON sudah tersedia online di **[https://nextmon.tunnelizer.com/](https://nextmon.tunnelizer.com/)**.
+
+Bagi yang ingin mencoba atau meminta **akun gratis** untuk memakai dashboard NextMON, silakan hubungi:
+- **WhatsApp:** [6281586843522](https://wa.me/6281586843522)
+- **Email:** [kurniawan.firman94@gmail.com](mailto:kurniawan.firman94@gmail.com)
 
 ## Cara termudah di Windows: NextMON Server
 [**NextMON Server**](https://github.com/FirmanKurniawan/NextMon-Server) adalah peluncur `.exe` portabel (tray, panel kontrol, manajer runtime PHP/Node, backup, update) yang menjalankan **satu edisi** NextMON, PHP *atau* Next.js, tanpa instalasi. Unduh paket **lite** (runtime diunduh dari panel) atau **full** (PHP + Node bawaan) di halaman [Releases](https://github.com/FirmanKurniawan/NextMon/releases), ekstrak, lalu klik dua kali `NextMON Server.exe`. Petunjuk lengkap: [README NextMON Server](https://github.com/FirmanKurniawan/NextMon-Server#readme).
