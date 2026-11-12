@@ -145,6 +145,12 @@ export function request(owner?: string): [string, Record<string, string>, string
   return ['/system/script', q, ['name']];
 }
 
+/** Mikhmon `owner` string for unix timestamp `ts` in `tz`, e.g. "nov2026". */
+export function ownerFor(t: number, tz = 'UTC'): string {
+  const p = zonedParts(t, tz);
+  return `${MON[p.mo - 1]}${p.y}`;
+}
+
 /** Parsed sales rows, cached for ttl seconds under `cacheKey` (build it with Cache.scope(ws, 'sales', routerId)). */
 export async function fetchSales(r: Driver, cacheKey: string, tz = 'UTC', ttl = 45, owner?: string): Promise<Sale[]> {
   const key = `${cacheKey}|${owner ?? 'all'}`;
@@ -159,4 +165,15 @@ export async function fetchSales(r: Driver, cacheKey: string, tz = 'UTC', ttl = 
   );
 }
 
-export const Sales = { ts, parse, sum, filter, daily, byProfile, recordName, request, fetch: fetchSales, zonedParts, zonedToTs };
+/** Stale-while-revalidate variant for dashboard polling so slow /system/script scans never stall refreshes. */
+export async function fetchSalesSwr(r: Driver, cacheKey: string, tz = 'UTC', freshSec = 60, staleSec = 600, owner?: string): Promise<Sale[]> {
+  const key = `${cacheKey}|${owner ?? 'all'}`;
+  const load = async () => {
+    const [path, q, props] = request(owner);
+    return parse(await r.print(path, q, props), tz);
+  };
+  if (r.demo) return load();
+  return Cache.rememberSwr(key, freshSec, staleSec, load, cacheKey);
+}
+
+export const Sales = { ts, parse, sum, filter, daily, byProfile, recordName, request, ownerFor, fetch: fetchSales, fetchSwr: fetchSalesSwr, zonedParts, zonedToTs };

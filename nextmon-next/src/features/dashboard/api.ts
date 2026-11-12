@@ -1,5 +1,6 @@
 /** JSON endpoints used by the dashboard (shared JS pages.js): /json/dashboard, /json/logs, /json/traffic, /json/interfaces, /json/health. */
 import type { ApiRoute } from '../types.ts';
+import { Cache } from '../../lib/cache.ts';
 import { getSettings } from '../../lib/store.ts';
 import { dashboardData } from './data.ts';
 import { IFACE_RE } from '../../lib/traffic-hub.ts';
@@ -14,8 +15,14 @@ export const dashboardApi: ApiRoute = {
 
 export const logsApi: ApiRoute = {
   async GET(ctx) {
-    const rows = await ctx.driver().print('/log', {}, ['time', 'topics', 'message']);
-    const data = rows.filter((x) => (x.topics ?? '').toLowerCase().includes('hotspot')).reverse().slice(0, 20);
+    const r = ctx.driver();
+    const load = async () => {
+      const rows = await r.print('/log', {}, ['time', 'topics', 'message']);
+      return rows.filter((x) => (x.topics ?? '').toLowerCase().includes('hotspot')).reverse().slice(0, 20);
+    };
+    const data = r.demo || !ctx.router
+      ? await load()
+      : await Cache.rememberSwr(Cache.scope(ctx.workspace.id, 'hslogs', ctx.router.id), 15, 120, load, `${ctx.router.owner}:${ctx.router.id}`);
     return { ok: true, data };
   },
 };

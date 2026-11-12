@@ -7,7 +7,7 @@
  */
 import { singleton } from './singleton.ts';
 
-type Entry = { exp: number; gen: number; v: unknown };
+type Entry = { exp: number; staleExp?: number; gen: number; v: unknown };
 const state = singleton('cache', () => ({ m: new Map<string, Entry>(), gens: new Map<string, number>(), inflight: new Map<string, Promise<unknown>>() }));
 const MAX = 5000;
 
@@ -20,6 +20,7 @@ type CacheApi = {
   delete(key: string): void;
   clear(): void;
   remember<T>(key: string, ttlSec: number, fn: () => Promise<T>, ns?: string): Promise<T>;
+  rememberSwr<T>(key: string, freshSec: number, staleSec: number, fn: () => Promise<T>, ns?: string): Promise<T>;
 };
 
 export const Cache: CacheApi = {
@@ -73,5 +74,36 @@ export const Cache: CacheApi = {
       .finally(() => state.inflight.delete(key));
     state.inflight.set(key, p);
     return p;
+  },
+  /** Stale-while-revalidate: serves fresh entries instantly, serves stale entries while refreshing once in the background. */
+  async rememberSwr<T>(key: string, freshSec: number, staleSec: number, fn: () => Promise<T>, ns = ''): Promise<T> {
+    const e = state.m.get(key);
+    const now = Date.now();
+    const curGen = Cache.gen(ns);
+    const validGen = !ns || e?.gen === curGen;
+    const refresh = () => {
+      const fl = state.inflight.get(key);
+      if (fl) return fl as Promise<T>;
+      const gen = Cache.gen(ns);
+      const p = fn()
+        .then((v) => {
+          if (staleSec > 0) {
+            if (state.m.size >= MAX) Cache.set(key, v, staleSec, ns, gen);
+            state.m.set(key, { exp: Date.now() + freshSec * 1000, staleExp: Date.now() + staleSec * 1000, gen, v });
+          }
+          return v;
+        })
+        .finally(() => state.inflight.delete(key));
+      state.inflight.set(key, p);
+      return p;
+    };
+    if (e && validGen) {
+      if (now < e.exp) return e.v as T;
+      if (e.staleExp && now < e.staleExp) {
+        void refresh().catch(() => {});
+        return e.v as T;
+      }
+    }
+    return refresh();
   },
 };

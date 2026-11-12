@@ -188,7 +188,7 @@ export const CACHE_TTL: Record<string, number> = {
   '/ip/hotspot/ip-binding': 6,
   '/interface': 20,
   '/queue/simple': 6,
-  '/log': 4,
+  '/log': 12,
 };
 
 /**

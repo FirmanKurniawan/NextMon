@@ -2,7 +2,7 @@
 import { Cache } from '../../lib/cache.ts';
 import type { Driver } from '../../lib/driver.ts';
 import { fmtBytes } from '../../lib/fmt.ts';
-import { fetchSales, filter, daily, sum, zonedParts } from '../../lib/sales.ts';
+import { fetchSales, fetchSalesSwr, filter, daily, ownerFor, sum, zonedParts, zonedToTs } from '../../lib/sales.ts';
 import type { Sale } from '../../lib/sales.ts';
 
 const pad = (n: number) => String(n).padStart(2, '0');
@@ -13,17 +13,37 @@ const dayKey = (ts: number, tz: string) => {
 
 export type DashboardData = ReturnType<typeof compute> extends Promise<infer T> ? T : never;
 
+async function loadRecentSales(r: Driver, salesKey: string, tz: string, now: number): Promise<Sale[]> {
+  if (r.demo) return fetchSales(r, salesKey, tz, 45);
+  const p = zonedParts(now, tz);
+  const cur = ownerFor(now, tz);
+  const curRows = await fetchSalesSwr(r, salesKey, tz, 60, 600, cur);
+  if (p.d > 14) return curRows;
+  // On days 1..14, merge the previous month if already cached; otherwise warm it sequentially in the
+  // background so RouterOS does not run two full /system/script scans concurrently on cold load.
+  const prevMo = p.mo === 1 ? 12 : p.mo - 1;
+  const prevYr = p.mo === 1 ? p.y - 1 : p.y;
+  const prev = ownerFor(zonedToTs(prevYr, prevMo, 15, 12, 0, 0, tz), tz);
+  const prevKey = `${salesKey}|${prev}`;
+  const prevHit = Cache.get<Sale[]>(prevKey, salesKey);
+  if (prevHit) return [...curRows, ...prevHit].sort((x, y) => y.ts - x.ts);
+  void fetchSalesSwr(r, salesKey, tz, 600, 3600, prev).catch(() => {});
+  return curRows;
+}
+
 async function compute(r: Driver, salesKey: string, tz: string, currency: string) {
-  const got = await r.printMany({
-    res: ['/system/resource'],
-    idn: ['/system/identity'],
-    act: ['/ip/hotspot/active', {}, ['user']],
-    usr: ['/ip/hotspot/user', {}, ['name', 'profile']],
-    if: ['/interface', {}, ['name', 'type']],
-  });
-  const sales: Sale[] = await fetchSales(r, salesKey, tz, 45);
-  const res = got.res?.[0] ?? {};
   const now = Math.floor(Date.now() / 1000);
+  const [got, sales] = await Promise.all([
+    r.printMany({
+      res: ['/system/resource'],
+      idn: ['/system/identity'],
+      act: ['/ip/hotspot/active', {}, ['user']],
+      usr: ['/ip/hotspot/user', {}, ['name', 'profile']],
+      if: ['/interface', {}, ['name', 'type']],
+    }),
+    loadRecentSales(r, salesKey, tz, now),
+  ]);
+  const res = got.res?.[0] ?? {};
   const today = filter(sales, 'day', dayKey(now, tz), '', tz);
   const monthKey = dayKey(now, tz).slice(0, 7);
   const month = filter(sales, 'month', monthKey, '', tz);
